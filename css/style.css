@@ -171,6 +171,7 @@ nav a:hover { color: var(--text); }
     width: 130px;
     height: auto;
     transition: transform 0.4s;
+    clip-path: inset(4% 4% 2% 4% round 10px);
 }
 .craft-card:hover { transform: scale(1.06); }
 .craft-card-1 { transform: rotate(-5deg); }
@@ -179,15 +180,15 @@ nav a:hover { color: var(--text); }
 .craft-card-2:hover { transform: rotate(4deg) scale(1.06); }
 
 .craft-arrow {
-    width: 32px;
-    opacity: 0.4;
+    width: 52px;
+    opacity: 0.5;
     transform: rotate(90deg);
 }
 
 .cauldron-scene {
     position: relative;
     width: 340px;
-    height: 480px;
+    height: 460px;
     flex-shrink: 0;
     overflow: visible;
 }
@@ -199,32 +200,33 @@ nav a:hover { color: var(--text); }
 }
 
 .c-logs  { bottom: 0; width: 260px; z-index: 1; }
-.c-back  { bottom: 32px; width: 250px; z-index: 2; }
+.c-back  { bottom: 25px; width: 250px; z-index: 2; }
 
 .c-swirl {
-    bottom: 170px;
-    width: 180px;
-    height: 100px;
+    bottom: 160px;
+    width: 220px;
+    height: 110px;
     z-index: 3;
     border-radius: 50%;
     overflow: hidden;
 }
 
-.c-front { bottom: 32px; width: 250px; z-index: 4; }
-.c-fire  { bottom: 12px; width: 240px; z-index: 5; opacity: 0.9; }
+.c-front { bottom: 25px; width: 250px; z-index: 4; }
+.c-fire  { bottom: 2px; width: 260px; z-index: 5; opacity: 0.85; }
 
 .c-smoke {
-    bottom: 250px;
-    width: 300px;
+    bottom: 200px;
+    width: 400px;
     opacity: 0;
-    z-index: 6;
+    z-index: 8;
     pointer-events: none;
 }
 
 .c-result {
     width: 140px;
     z-index: 7;
-    bottom: 300px;
+    bottom: 280px;
+    clip-path: inset(4% 4% 2% 4% round 10px);
     animation: resultFloat 4s ease-in-out infinite;
     filter: drop-shadow(0 0 20px rgba(232, 168, 73, 0.3));
 }
@@ -338,13 +340,13 @@ footer {
     .header-logo { height: 26px; }
     nav a { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
     .hero-logo { width: min(340px, 80vw); }
-    .cauldron-scene { width: 260px; height: 380px; }
-    .c-logs { width: 210px; }
-    .c-fire { width: 170px; bottom: 32px; }
-    .c-back, .c-front { width: 195px; bottom: 30px; }
-    .c-swirl { width: 140px; height: 75px; bottom: 135px; }
-    .c-smoke { width: 230px; bottom: 195px; }
-    .c-result { width: 110px; bottom: 240px; }
+    .cauldron-scene { width: 260px; height: 360px; }
+    .c-logs { width: 200px; }
+    .c-fire { width: 200px; bottom: 14px; }
+    .c-back, .c-front { width: 190px; bottom: 20px; }
+    .c-swirl { width: 170px; height: 85px; bottom: 125px; }
+    .c-smoke { width: 300px; bottom: 155px; }
+    .c-result { width: 105px; bottom: 215px; }
     .craft-card { width: 100px; }
     .craft-arrow { width: 24px; }
     .game-section { padding: 4rem 1.5rem; }
