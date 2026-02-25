@@ -3,772 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misaligned Games — Innovative Indie Game Studio</title>
-    <meta name="description" content="Misaligned Games creates ambitious games with innovative mechanics. Currently developing Entropedia, a generative PvP deckbuilder.">
-    
+    <title>Misaligned Games</title>
+    <meta name="description" content="Misaligned Games, an indie game studio. Currently developing Entropedia, a generative PvP deckbuilder.">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-cream: #f5f0e6;
-            --bg-paper: #ebe4d4;
-            --accent-orange: #e8a849;
-            --accent-green: #7fb069;
-            --accent-blue: #5fa8d3;
-            --accent-pink: #e07a8d;
-            --accent-purple: #9b7ed9;
-            --text-dark: #3d3529;
-            --text-brown: #6b5d4d;
-            --border-sketch: #8b7355;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Fredoka', sans-serif;
-            background: var(--bg-cream);
-            color: var(--text-dark);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Paper texture overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.04;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        /* Sketchy border helper */
-        .sketchy {
-            position: relative;
-        }
-
-        .sketchy::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border: 3px solid var(--border-sketch);
-            border-radius: 12px 8px 14px 6px;
-            transform: rotate(-0.5deg);
-            pointer-events: none;
-        }
-
-        /* Header */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            background: linear-gradient(to bottom, var(--bg-cream) 60%, transparent 100%);
-        }
-
-        .header-logo {
-            height: 36px;
-            width: auto;
-            filter: invert(22%) sepia(15%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(90%);
-            transition: transform 0.3s ease;
-        }
-
-        .header-logo:hover {
-            transform: rotate(-3deg) scale(1.05);
-        }
-
-        nav {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        nav a {
-            color: var(--text-brown);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        nav a:hover {
-            background: var(--accent-orange);
-            color: white;
-            transform: translateY(-2px) rotate(-1deg);
-        }
-
-        /* Decorative elements */
-        .doodle {
-            position: absolute;
-            pointer-events: none;
-            opacity: 0.15;
-        }
-
-        .star {
-            width: 30px;
-            height: 30px;
-        }
-
-        .squiggle {
-            width: 80px;
-            height: auto;
-        }
-
-        /* Hero */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 8rem 2rem 6rem;
-            position: relative;
-        }
-
-        .hero-doodles {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-        }
-
-        .floating-card {
-            position: absolute;
-            width: 60px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-pink) 100%);
-            border-radius: 8px;
-            border: 3px solid var(--border-sketch);
-            animation: floatCard 8s ease-in-out infinite;
-            opacity: 0.3;
-        }
-
-        .floating-card:nth-child(1) { top: 15%; left: 10%; animation-delay: 0s; }
-        .floating-card:nth-child(2) { top: 25%; right: 15%; animation-delay: -2s; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%); }
-        .floating-card:nth-child(3) { bottom: 30%; left: 8%; animation-delay: -4s; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); }
-        .floating-card:nth-child(4) { bottom: 20%; right: 12%; animation-delay: -6s; }
-
-        @keyframes floatCard {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            25% { transform: translateY(-20px) rotate(5deg); }
-            50% { transform: translateY(-10px) rotate(-3deg); }
-            75% { transform: translateY(-25px) rotate(8deg); }
-        }
-
-        .hero-logo {
-            width: 320px;
-            max-width: 80vw;
-            height: auto;
-            margin-bottom: 2rem;
-            filter: invert(22%) sepia(15%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(90%);
-            animation: wobble 4s ease-in-out infinite;
-        }
-
-        @keyframes wobble {
-            0%, 100% { transform: rotate(-1deg); }
-            50% { transform: rotate(1deg); }
-        }
-
-        .hero h1 {
-            font-family: 'Gaegu', cursive;
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            line-height: 1.1;
-            color: var(--text-dark);
-        }
-
-        .hero h1 .highlight {
-            display: inline-block;
-            background: linear-gradient(to right, var(--accent-orange), var(--accent-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: wiggle 3s ease-in-out infinite;
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
-        }
-
-        .tagline {
-            font-size: 1.3rem;
-            color: var(--text-brown);
-            max-width: 500px;
-            margin-bottom: 2.5rem;
-            font-weight: 400;
-        }
-
-        .cta-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            font-family: inherit;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 3px solid var(--border-sketch);
-            position: relative;
-        }
-
-        .btn-primary {
-            background: var(--accent-orange);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-4px) rotate(-2deg);
-            box-shadow: 6px 6px 0 var(--border-sketch);
-        }
-
-        .btn-secondary {
-            background: var(--bg-paper);
-            color: var(--text-dark);
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-4px) rotate(2deg);
-            box-shadow: 6px 6px 0 var(--border-sketch);
-            background: var(--accent-green);
-            color: white;
-        }
-
-        /* Scroll indicator */
-        .scroll-hint {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-brown);
-            font-size: 0.9rem;
-            opacity: 0.7;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(10px); }
-        }
-
-        /* Sections */
-        section {
-            padding: 6rem 2rem;
-            max-width: 1100px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .section-label {
-            font-family: 'Gaegu', cursive;
-            font-size: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--accent-pink);
-            margin-bottom: 0.5rem;
-            display: inline-block;
-            transform: rotate(-2deg);
-        }
-
-        .section-title {
-            font-family: 'Gaegu', cursive;
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            margin-bottom: 2.5rem;
-            line-height: 1.2;
-            color: var(--text-dark);
-        }
-
-        /* Game Section */
-        .game-section {
-            background: var(--bg-paper);
-            border: 4px solid var(--border-sketch);
-            border-radius: 20px 16px 24px 12px;
-            padding: 3rem;
-            margin: 4rem auto;
-            max-width: 1100px;
-            position: relative;
-            transform: rotate(-0.3deg);
-        }
-
-        .game-section::before {
-            content: '✨';
-            position: absolute;
-            top: -15px;
-            left: 30px;
-            font-size: 2rem;
-        }
-
-        .game-section::after {
-            content: '🎴';
-            position: absolute;
-            top: -10px;
-            right: 40px;
-            font-size: 1.8rem;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .game-title {
-            font-family: 'Gaegu', cursive;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .game-badge {
-            background: var(--accent-green);
-            color: white;
-            padding: 0.5rem 1.2rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 3px solid var(--border-sketch);
-            transform: rotate(3deg);
-        }
-
-        .game-description {
-            font-size: 1.15rem;
-            color: var(--text-brown);
-            max-width: 600px;
-            margin-bottom: 2rem;
-        }
-
-        /* Screenshot Gallery - Polaroid style */
-        .screenshots {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 2.5rem 0;
-        }
-
-        .screenshot {
-            background: white;
-            padding: 0.8rem 0.8rem 2.5rem;
-            border-radius: 4px;
-            box-shadow: 4px 4px 0 var(--border-sketch), 0 8px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .screenshot:nth-child(1) { transform: rotate(-2deg); }
-        .screenshot:nth-child(2) { transform: rotate(1.5deg); }
-        .screenshot:nth-child(3) { transform: rotate(-1deg); }
-        .screenshot:nth-child(4) { transform: rotate(2deg); }
-        .screenshot:nth-child(5) { transform: rotate(-1.5deg); }
-
-        .screenshot:hover {
-            transform: rotate(0deg) scale(1.02) translateY(-8px);
-            box-shadow: 8px 8px 0 var(--border-sketch), 0 12px 30px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-
-        .screenshot img {
-            width: 100%;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            border-radius: 2px;
-        }
-
-        .screenshot-label {
-            position: absolute;
-            bottom: 0.6rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Gaegu', cursive;
-            font-size: 0.95rem;
-            color: var(--text-brown);
-            white-space: nowrap;
-        }
-
-        /* Values Grid */
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .value-card {
-            padding: 2rem;
-            background: var(--bg-paper);
-            border: 3px solid var(--border-sketch);
-            border-radius: 16px 12px 18px 10px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .value-card:nth-child(1) { transform: rotate(-0.8deg); }
-        .value-card:nth-child(2) { transform: rotate(0.5deg); }
-        .value-card:nth-child(3) { transform: rotate(-0.3deg); }
-        .value-card:nth-child(4) { transform: rotate(0.7deg); }
-        .value-card:nth-child(5) { transform: rotate(-0.5deg); }
-        .value-card:nth-child(6) { transform: rotate(0.4deg); }
-
-        .value-card:hover {
-            transform: rotate(0deg) translateY(-6px);
-            box-shadow: 5px 5px 0 var(--border-sketch);
-        }
-
-        .value-icon {
-            font-size: 2.2rem;
-            margin-bottom: 0.8rem;
-            display: inline-block;
-            animation: iconBounce 2s ease-in-out infinite;
-        }
-
-        .value-card:nth-child(2) .value-icon { animation-delay: -0.3s; }
-        .value-card:nth-child(3) .value-icon { animation-delay: -0.6s; }
-        .value-card:nth-child(4) .value-icon { animation-delay: -0.9s; }
-        .value-card:nth-child(5) .value-icon { animation-delay: -1.2s; }
-        .value-card:nth-child(6) .value-icon { animation-delay: -1.5s; }
-
-        @keyframes iconBounce {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-5px) rotate(5deg); }
-        }
-
-        .value-card h3 {
-            font-family: 'Gaegu', cursive;
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-        }
-
-        .value-card p {
-            color: var(--text-brown);
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        /* About Section */
-        .about-section {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
-            border-radius: 24px 20px 28px 16px;
-            padding: 4rem 3rem;
-            margin: 4rem auto;
-            max-width: 1000px;
-            color: white;
-            position: relative;
-            transform: rotate(0.3deg);
-            border: 4px solid var(--border-sketch);
-        }
-
-        .about-section::before {
-            content: '💜';
-            position: absolute;
-            top: -12px;
-            right: 50px;
-            font-size: 1.8rem;
-        }
-
-        .about-section .section-label {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .about-section .section-title {
-            color: white;
-        }
-
-        .about-text {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            max-width: 700px;
-            opacity: 0.95;
-        }
-
-        .about-text strong {
-            color: var(--accent-orange);
-        }
-
-        /* Footer */
-        footer {
-            padding: 4rem 2rem;
-            text-align: center;
-            position: relative;
-        }
-
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 4px;
-            background: repeating-linear-gradient(
-                90deg,
-                var(--border-sketch) 0,
-                var(--border-sketch) 10px,
-                transparent 10px,
-                transparent 20px
-            );
-        }
-
-        .footer-logo {
-            height: 50px;
-            margin-bottom: 1.5rem;
-            filter: invert(22%) sepia(15%) saturate(800%) hue-rotate(5deg) brightness(95%) contrast(90%);
-            opacity: 0.7;
-        }
-
-        .footer-text {
-            color: var(--text-brown);
-            font-size: 1rem;
-        }
-
-        .footer-links {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-        }
-
-        .footer-links a {
-            color: var(--text-brown);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.3rem 0.8rem;
-            border-radius: 8px;
-        }
-
-        .footer-links a:hover {
-            background: var(--accent-orange);
-            color: white;
-            transform: rotate(-2deg);
-        }
-
-        .footer-copy {
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            header {
-                padding: 1rem;
-            }
-
-            .header-logo {
-                height: 28px;
-            }
-
-            nav a {
-                padding: 0.4rem 0.7rem;
-                font-size: 0.9rem;
-            }
-
-            .hero-logo {
-                width: 240px;
-            }
-
-            .game-section {
-                padding: 2rem 1.5rem;
-                margin: 2rem 1rem;
-            }
-
-            .about-section {
-                padding: 3rem 2rem;
-                margin: 2rem 1rem;
-            }
-
-            section {
-                padding: 4rem 1.5rem;
-            }
-
-            .floating-card {
-                display: none;
-            }
-        }
-
-        /* Fun cursor on interactive elements */
-        .btn, nav a, .screenshot {
-            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E👆%3C/text%3E%3C/svg%3E"), pointer;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
         <img src="images/studio_logo.png" alt="Misaligned Games" class="header-logo">
         <nav>
-            <a href="#game">Our Game</a>
-            <a href="#values">Values</a>
-            <a href="https://demo.entropedia.xyz" target="_blank">Play! 🎮</a>
+            <a href="#game">Entropedia</a>
+            <a href="#about">About</a>
+            <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
         </nav>
     </header>
 
     <main>
         <section class="hero">
-            <div class="hero-doodles">
-                <div class="floating-card"></div>
-                <div class="floating-card"></div>
-                <div class="floating-card"></div>
-                <div class="floating-card"></div>
-            </div>
-            
             <img src="images/studio_logo.png" alt="Misaligned Games" class="hero-logo">
-            <h1>Games that go<br><span class="highlight">a bit sideways</span></h1>
-            <p class="tagline">We make ambitious games with weird & wonderful mechanics.</p>
+            <h1>Games that go a bit <span class="sideways">sideways</span></h1>
+            <p class="tagline">An indie studio making games with mechanics that haven't been tried before.</p>
             <div class="cta-group">
-                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">
-                    Play Entropedia Demo
-                    <span>→</span>
-                </a>
-                <a href="#values" class="btn btn-secondary">What we believe in</a>
-            </div>
-            
-            <div class="scroll-hint">
-                <span>↓</span>
-                scroll for more
+                <a href="#game" class="btn btn-primary">See what we're making</a>
+                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-secondary">Play the demo</a>
             </div>
         </section>
 
-        <div class="game-section" id="game">
+        <div class="divider"></div>
+
+        <section class="game-section" id="game">
             <div class="game-header">
-                <div>
-                    <div class="section-label">~ cooking up ~</div>
-                    <h2 class="game-title">Entropedia</h2>
-                </div>
-                <span class="game-badge">Coming Early 2026 🌟</span>
+                <img src="images/Entropedia_logo.png" alt="Entropedia" class="game-logo">
+                <p class="game-sub">Generative PvP Deckbuilder</p>
+                <p class="game-desc">Every card is procedurally crafted. Throw ingredients into the cauldron, discover unique combinations, and battle with a deck no one else has.</p>
             </div>
-            <p class="game-description">A procedural PvP deckbuilder where every card is unique. Throw ingredients into the cauldron, craft your arsenal, and discover strategies no one has seen before!</p>
-            
-            <div class="screenshots">
-                <div class="screenshot">
-                    <img src="images/menu.webp" alt="Entropedia main menu">
-                    <span class="screenshot-label">The Cauldron ✨</span>
-                </div>
-                <div class="screenshot">
-                    <img src="images/Screenshot1.webp" alt="Card crafting in the Laboratory">
-                    <span class="screenshot-label">Craft Cards 🧪</span>
-                </div>
-                <div class="screenshot">
-                    <img src="images/Screenshot2.webp" alt="PvP card battle gameplay">
-                    <span class="screenshot-label">Battle! ⚔️</span>
-                </div>
-                <div class="screenshot">
-                    <img src="images/Screenshot3.webp" alt="Quest and progression system">
-                    <span class="screenshot-label">Level Up 📈</span>
-                </div>
-                <div class="screenshot">
-                    <img src="images/Screenshot4.webp" alt="Adventure mode map">
-                    <span class="screenshot-label">Adventure 🗺️</span>
-                </div>
-            </div>
-            
-            <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">
-                Try the Demo Now!
-                <span>🎮</span>
-            </a>
-        </div>
 
-        <section id="values">
-            <div class="section-label">~ what drives us ~</div>
-            <h2 class="section-title">Built on principles, not just vibes</h2>
-            
-            <div class="values-grid">
-                <div class="value-card">
-                    <div class="value-icon">🔮</div>
-                    <h3>Innovation First</h3>
-                    <p>We don't copy gameplay loops. We use tech (especially ML!) to push game design into unexplored territory.</p>
+            <div class="cauldron-craft">
+                <div class="craft-inputs">
+                    <img src="images/cards_widget/FullMoon.png" alt="Full Moon" class="craft-card craft-card-1">
+                    <img src="images/cards_widget/Wolf.png" alt="Wolf" class="craft-card craft-card-2">
                 </div>
-                
-                <div class="value-card">
-                    <div class="value-icon">💜</div>
-                    <h3>Radical Respect</h3>
-                    <p>A welcoming space for everyone. No exceptions for "top performers." We act fast against any harassment.</p>
+
+                <img src="images/cards_widget/arrow_craft.png" alt="" class="craft-arrow">
+
+                <div class="cauldron-scene">
+                    <img src="images/cauldron/cauldron_logs.png" class="c-layer c-logs" alt="">
+                    <img src="images/cauldron/fire/CauldronFire1.png" class="c-layer c-fire" alt="" id="cauldronFire">
+                    <img src="images/cauldron/CauldronBack.png" class="c-layer c-back" alt="">
+                    <canvas id="swirlCanvas" class="c-layer c-swirl" width="180" height="100"></canvas>
+                    <img src="images/cauldron/CauldronFront.png" class="c-layer c-front" alt="">
+                    <img src="images/cauldron/CauldronSmoke1.png" class="c-layer c-smoke" id="smoke1" alt="">
+                    <img src="images/cauldron/CauldronSmoke2.png" class="c-layer c-smoke" id="smoke2" alt="">
+                    <img src="images/cauldron/CauldronSmoke3.png" class="c-layer c-smoke" id="smoke3" alt="">
+                    <img src="images/cards_widget/Werewolf.png" alt="Werewolf" class="c-layer c-result">
                 </div>
-                
-                <div class="value-card">
-                    <div class="value-icon">🤝</div>
-                    <h3>Equity & Generosity</h3>
-                    <p>Team members own a real share of what we build. And yes, we pay our taxes where they're highest!</p>
-                </div>
-                
-                <div class="value-card">
-                    <div class="value-icon">🎯</div>
-                    <h3>Optimize for Fun</h3>
-                    <p>We measure what keeps players engaged and follow those signals. You show us where the fun lives.</p>
-                </div>
-                
-                <div class="value-card">
-                    <div class="value-icon">🙃</div>
-                    <h3>Flat Hierarchy</h3>
-                    <p>Good ideas come from anywhere. We judge them by one thing: does it make the game more fun?</p>
-                </div>
-                
-                <div class="value-card">
-                    <div class="value-icon">🚀</div>
-                    <h3>Freedom = Profit</h3>
-                    <p>Valve & Riot stay independent because they're profitable. We aim for sustainability to stay free.</p>
-                </div>
+            </div>
+
+            <div class="screenshots">
+                <div class="screenshot"><img src="images/Screenshot1.webp" alt="Card crafting"></div>
+                <div class="screenshot"><img src="images/Screenshot2.webp" alt="PvP battle"></div>
+                <div class="screenshot"><img src="images/Screenshot3.webp" alt="Progression"></div>
+                <div class="screenshot"><img src="images/Screenshot4.webp" alt="Adventure"></div>
+            </div>
+
+            <div class="screenshots-cta">
+                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">Play the Demo</a>
             </div>
         </section>
 
-        <div class="about-section">
-            <div class="section-label">~ why we exist ~</div>
-            <h2 class="section-title">Making games the right way</h2>
-            <p class="about-text">
-                We started Misaligned Games for two reasons: <strong>the freedom to work on games that genuinely excite us</strong>, and to build a place where work is actually enjoyable for everyone involved.
-                <br><br>
-                Great games come from teams who love what they do. We're creating a space where creativity thrives, ideas flow freely, and everyone shares in what we build together. No crunch. No toxicity. Just good games.
+        <div class="divider"></div>
+
+        <section class="about-section" id="about">
+            <h2>What drives us</h2>
+            <p class="about-intro">
+                We started Misaligned Games for the freedom to work on games that genuinely excite us, and to build a studio where the work is actually enjoyable.
             </p>
-        </div>
+            <div class="values-list">
+                <div class="value-item">
+                    <h4>Innovation first</h4>
+                    <p>We use tech (especially ML) to push game design into territory nobody's explored yet.</p>
+                </div>
+                <div class="value-item">
+                    <h4>Shared ownership</h4>
+                    <p>Team members own a real share of what we build. Everyone is invested in what we ship.</p>
+                </div>
+                <div class="value-item">
+                    <h4>Flat by default</h4>
+                    <p>Good ideas come from anywhere. We judge them on one thing: does it make the game more fun?</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
         <img src="images/studio_logo.png" alt="Misaligned Games" class="footer-logo">
-        <p class="footer-text">Making weird & wonderful games with innovative mechanics ✨</p>
         <div class="footer-links">
             <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
-            <a href="mailto:contact@misaligned.games">Say Hello</a>
+            <a href="mailto:contact@misaligned.games">Contact</a>
         </div>
-        <p class="footer-text footer-copy">© 2025 Misaligned Games</p>
+        <p class="footer-copy">&copy; 2025 Misaligned Games</p>
     </footer>
+
+    <script src="js/main.js"></script>
 </body>
 </html>

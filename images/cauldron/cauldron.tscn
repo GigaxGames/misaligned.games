@@ -1,0 +1,586 @@
+[gd_scene load_steps=55 format=3 uid="uid://dg14nf1k72lgn"]
+
+[ext_resource type="Script" uid="uid://cqoivoipj4qir" path="res://Scripts/Game/Cardopedia/CardopediaCauldron.gd" id="1_6yvwc"]
+[ext_resource type="Script" uid="uid://btdfj3qvmr665" path="res://Scripts/Animation/WaveParent.gd" id="2_ugf26"]
+[ext_resource type="Texture2D" uid="uid://b0hn83gvrt4ah" path="res://Assets/Textures/Scenes/CauldronScene/Smoke/CauldronSmoke1.png" id="3_3iq5n"]
+[ext_resource type="AudioStream" uid="uid://bip21ptfkg8cq" path="res://Assets/Audio/SFX/fusion_cauldron.mp3" id="3_ycfp2"]
+[ext_resource type="AudioStream" uid="uid://b754v01yuvt62" path="res://Assets/Audio/Ambient/bubbles.mp3" id="4_uduix"]
+[ext_resource type="Texture2D" uid="uid://bhoe2i4e1gxbw" path="res://Assets/Textures/Scenes/CauldronScene/Smoke/CauldronSmoke2.png" id="5_3iq5n"]
+[ext_resource type="Texture2D" uid="uid://cwbkdx1tdn4rt" path="res://Assets/Textures/Scenes/CauldronScene/Smoke/CauldronSmoke3.png" id="5_emtsx"]
+[ext_resource type="AudioStream" uid="uid://d3phvd7kpxi6v" path="res://Assets/Audio/Ambient/fire_1.mp3" id="5_ycfp2"]
+[ext_resource type="Texture2D" uid="uid://do5hjx276yyft" path="res://Assets/Textures/Cards/Textures/back.jpg" id="6_3iq5n"]
+[ext_resource type="AudioStream" uid="uid://3uumf35gbfse" path="res://Assets/Audio/SFX/Shapeform/Activate Glyph Forcefield.wav" id="9_fuatu"]
+[ext_resource type="Texture2D" uid="uid://50dhgo4ahdt7" path="res://Assets/Textures/Particles/bubble-1.png" id="9_ugf26"]
+[ext_resource type="Texture2D" uid="uid://c1sfbgqpu4uc6" path="res://Assets/Textures/Scenes/CauldronScene/Bubbles/bouillon-2.png" id="10_emtsx"]
+[ext_resource type="Texture2D" uid="uid://cv6x2bhdjvani" path="res://Assets/Textures/Scenes/CauldronScene/Bubbles/bouillon-3.png" id="11_0oc6d"]
+[ext_resource type="Texture2D" uid="uid://b7mnm54wo4wxx" path="res://Assets/Textures/Scenes/CauldronScene/Bubbles/bouillon.png" id="12_cqscb"]
+[ext_resource type="Texture2D" uid="uid://dd4qb6pwm8s7y" path="res://Assets/Textures/Scenes/CauldronScene/Cauldron/CauldronBack.png" id="13_u2oqt"]
+[ext_resource type="PackedScene" uid="uid://df5374dgcxxks" path="res://Scenes/whirpool.tscn" id="14_k8qnq"]
+[ext_resource type="Material" uid="uid://c28pu3t0afjg1" path="res://Assets/Shaders/Instances/WaterDisplacement.tres" id="14_mm8ny"]
+[ext_resource type="Texture2D" uid="uid://dfa0bw20avfo5" path="res://Assets/Textures/Scenes/CauldronScene/Smoke/CauldronSmoke.png" id="14_ycfp2"]
+[ext_resource type="Texture2D" uid="uid://buuxihxnwuu18" path="res://Assets/Textures/Scenes/CauldronScene/Fire/CauldronFire1.png" id="15_7ygxk"]
+[ext_resource type="Texture2D" uid="uid://dsuhmqmjrtnhx" path="res://Assets/Textures/Scenes/CauldronScene/Fire/CauldronFire2.png" id="16_nrcd4"]
+[ext_resource type="Texture2D" uid="uid://dwrionwge3jjg" path="res://Assets/Textures/Scenes/CauldronScene/Fire/CauldronFire3.png" id="17_u2oqt"]
+[ext_resource type="Texture2D" uid="uid://v1ly4jl4h474" path="res://Assets/Textures/Scenes/CauldronScene/Flame/flame-2.png" id="18_k8qnq"]
+[ext_resource type="Texture2D" uid="uid://c32o26u0a32rf" path="res://Assets/Textures/Scenes/CauldronScene/Cauldron/cauldron_logs.png" id="18_mm8ny"]
+[ext_resource type="Texture2D" uid="uid://b2aa1uxwcynfd" path="res://Assets/Textures/Scenes/CauldronScene/Cauldron/CauldronFront.png" id="19_4ub0d"]
+[ext_resource type="Texture2D" uid="uid://dfooyvmjs3tev" path="res://Assets/Textures/Scenes/CauldronScene/Flame/flame-3.png" id="19_mm8ny"]
+[ext_resource type="Texture2D" uid="uid://dxt67stsclsp5" path="res://Assets/Trait.png" id="20_3iq5n"]
+[ext_resource type="Texture2D" uid="uid://xyo0d08hnsrm" path="res://Assets/Textures/Scenes/CauldronScene/Flame/flame.png" id="20_4ub0d"]
+[ext_resource type="Shader" path="res://Assets/Shaders/Instances/WaterDisplacement.gdshader" id="22_4ub0d"]
+[ext_resource type="Texture2D" uid="uid://d353ionjmcf6y" path="res://Assets/Textures/GUI/merge_cards.png" id="26_7ygxk"]
+[ext_resource type="PackedScene" uid="uid://c4yfa1uxh470" path="res://Scenes/Components/RomanNumeralDisplay.tscn" id="27_7ygxk"]
+[ext_resource type="Script" uid="uid://74tqptfpc13w" path="res://Scripts/Animation/LoopScaleParent.gd" id="27_nrcd4"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g3aq7"]
+radius = 214.0
+
+[sub_resource type="Shader" id="Shader_3iq5n"]
+code = "shader_type canvas_item;
+
+// Main texture (automatically provided by Godot for canvas_item)
+uniform sampler2D noise_texture : filter_linear, repeat_enable;
+uniform vec2 speed = vec2(0.5, 0.3);
+uniform float distortion_strength : hint_range(0.0, 0.1) = 0.02;
+uniform vec2 offset = vec2(0.0, 0.0);
+
+void fragment() {
+    // Calculate animated UV coordinates for noise sampling
+    vec2 noise_uv = UV + offset + speed * TIME;
+
+    // Sample the noise texture
+    vec4 noise_sample = texture(noise_texture, noise_uv);
+
+    // Convert noise from [0,1] to [-1,1] range for distortion
+    vec2 distortion = (noise_sample.rg - 0.5) * 2.0 * distortion_strength;
+
+    // Apply distortion to original UV coordinates
+    vec2 distorted_uv = UV + distortion;
+
+    // Sample the main texture with distorted UV
+    COLOR = texture(TEXTURE, distorted_uv);
+}"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_36ut3"]
+frequency = 0.0018
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_08053"]
+seamless = true
+noise = SubResource("FastNoiseLite_36ut3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lq0oc"]
+shader = SubResource("Shader_3iq5n")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_08053")
+shader_parameter/speed = Vector2(0, 0.1)
+shader_parameter/distortion_strength = 0.03
+shader_parameter/offset = Vector2(0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0oc6d"]
+draw_center = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ugf26"]
+shader = SubResource("Shader_3iq5n")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_08053")
+shader_parameter/speed = Vector2(0, 0.1)
+shader_parameter/distortion_strength = 0.03
+shader_parameter/offset = Vector2(100, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0oc6d"]
+shader = SubResource("Shader_3iq5n")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_08053")
+shader_parameter/speed = Vector2(0, 0.1)
+shader_parameter/distortion_strength = 0.03
+shader_parameter/offset = Vector2(0, 2.33)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cqscb"]
+shader = SubResource("Shader_3iq5n")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_08053")
+shader_parameter/speed = Vector2(0, 0.1)
+shader_parameter/distortion_strength = 0.059
+shader_parameter/offset = Vector2(102.95, 0)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_mm8ny"]
+viewport_path = NodePath("SubViewPort")
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_slwq5"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_emtsx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_0oc6d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_cqscb")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Curve" id="Curve_ccplf"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.189922, 1), 0.0, 0.0, 0, 0, Vector2(0.313783, 0.841647), 0.0, 0.0, 0, 0, Vector2(0.428153, 0.932135), 0.0, 0.0, 0, 0, Vector2(0.542522, 0.766241), 0.0, 0.0, 0, 0, Vector2(0.662757, 0.894431), 0.0, 0.0, 0, 0, Vector2(0.812317, 0.63051), 0.0, 0.0, 0, 0, Vector2(0.968992, 1), 1.48185, 1.48185, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 9
+
+[sub_resource type="CurveTexture" id="CurveTexture_ogu7v"]
+curve = SubResource("Curve_ccplf")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mtxp6"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(100, 1, 1)
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 24.35
+initial_velocity_max = 76.52
+gravity = Vector3(0, -10, 0)
+scale_min = 1.5
+scale_max = 3.0
+scale_curve = SubResource("CurveTexture_ogu7v")
+turbulence_influence_min = 0.586
+turbulence_influence_max = 0.835
+turbulence_initial_displacement_min = 1.49012e-06
+turbulence_initial_displacement_max = 1.49012e-06
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0plw3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ogu7v"]
+seamless = true
+seamless_blend_skirt = 0.414
+noise = SubResource("FastNoiseLite_0plw3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_50cmj"]
+shader = ExtResource("22_4ub0d")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_ogu7v")
+shader_parameter/speed = Vector2(0.167, 0.1)
+shader_parameter/distortion_strength = 0.009
+shader_parameter/offset = Vector2(0, 0)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5wtoo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_7ygxk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_nrcd4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_u2oqt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jm38k"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("18_k8qnq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_mm8ny")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_4ub0d")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Animation" id="Animation_3iq5n"]
+resource_name = "Lower_flames"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CauldronFire:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.966667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(2, 2), Vector2(1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_h7248"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CropPanel2/Trait2:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.1891, 0.338151, 0.243142, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CropPanel1/Trait:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.1891, 0.338151, 0.243142, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CauldronFire:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CropPanel1/CardSlot:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(131, 461)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CropPanel2/CardSlot:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(294.778, 490)]
+}
+
+[sub_resource type="Animation" id="Animation_cvun0"]
+resource_name = "Start_crafting"
+length = 2.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CropPanel2/Trait2:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1.13333, 1.83333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.1891, 0.338151, 0.243142, 1), Color(0.188235, 0.337255, 0.243137, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CropPanel1/Trait:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1.13333, 1.83333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.1891, 0.338151, 0.243142, 1), Color(0.188235, 0.337255, 0.243137, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CauldronFire:scale")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 0), Vector2(2, 2)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CropPanel1/CardSlot:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1.40471),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(131, 461), Vector2(131, 625.87)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CropPanel2/CardSlot:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1.40471),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(294.778, 490), Vector2(294.778, 655)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v80va"]
+_data = {
+&"Lower_flames": SubResource("Animation_3iq5n"),
+&"RESET": SubResource("Animation_h7248"),
+&"Start_crafting": SubResource("Animation_cvun0")
+}
+
+[node name="Cauldron" type="Area2D"]
+disable_mode = 1
+script = ExtResource("1_6yvwc")
+
+[node name="DiscoveryCompletedSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_fuatu")
+bus = &"SFX"
+
+[node name="FusionCauldronSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_ycfp2")
+bus = &"SFX"
+
+[node name="AmbientSounds" type="Node" parent="."]
+
+[node name="Bubbles" type="AudioStreamPlayer" parent="AmbientSounds"]
+stream = ExtResource("4_uduix")
+autoplay = true
+bus = &"Ambience"
+
+[node name="Fire" type="AudioStreamPlayer" parent="AmbientSounds"]
+stream = ExtResource("5_ycfp2")
+autoplay = true
+bus = &"Ambience"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+z_index = 10
+position = Vector2(0, -437.067)
+shape = SubResource("CircleShape2D_g3aq7")
+
+[node name="CauldronSmoke" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_lq0oc")
+position = Vector2(-63, -219)
+scale = Vector2(0.88763, 0.88763)
+texture = ExtResource("14_ycfp2")
+
+[node name="CropPanel1" type="Panel" parent="."]
+clip_contents = true
+offset_left = -212.0
+offset_top = -941.0
+offset_right = 208.0
+offset_bottom = -471.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0oc6d")
+
+[node name="CardSlot" type="Node2D" parent="CropPanel1"]
+z_index = 1
+position = Vector2(131, 461)
+rotation = -0.0196967
+scale = Vector2(1.03282, 1.03282)
+script = ExtResource("2_ugf26")
+
+[node name="WaveParent" type="Node" parent="CropPanel1/CardSlot"]
+script = ExtResource("2_ugf26")
+amplitude = 5.0
+freq = 0.5
+time_offset = 1.0
+wave_type = 5
+metadata/_custom_type_script = "uid://btdfj3qvmr665"
+
+[node name="Back" type="Sprite2D" parent="CropPanel1/CardSlot"]
+visible = false
+rotation = 0.0196967
+scale = Vector2(0.621847, 0.621847)
+texture = ExtResource("6_3iq5n")
+
+[node name="Trait" type="Sprite2D" parent="CropPanel1"]
+visible = false
+modulate = Color(0.1891, 0.338151, 0.243142, 1)
+z_index = 11
+position = Vector2(129, 471)
+rotation = 0.0144287
+scale = Vector2(0.693367, 1.33446)
+texture = ExtResource("20_3iq5n")
+
+[node name="Smoke" type="Node2D" parent="."]
+
+[node name="CauldronSmoke1" type="Sprite2D" parent="Smoke"]
+material = SubResource("ShaderMaterial_ugf26")
+position = Vector2(-25.5872, -1004.38)
+scale = Vector2(0.88763, 0.88763)
+texture = ExtResource("3_3iq5n")
+
+[node name="CauldronSmoke2" type="Sprite2D" parent="Smoke"]
+material = SubResource("ShaderMaterial_0oc6d")
+position = Vector2(-25.5872, -1004.38)
+scale = Vector2(0.88763, 0.88763)
+texture = ExtResource("5_3iq5n")
+
+[node name="CauldronSmoke3" type="Sprite2D" parent="Smoke"]
+material = SubResource("ShaderMaterial_cqscb")
+position = Vector2(-25.5872, -1004.38)
+scale = Vector2(0.88763, 0.88763)
+texture = ExtResource("5_emtsx")
+
+[node name="CropPanel2" type="Panel" parent="."]
+clip_contents = true
+offset_left = -231.0
+offset_top = -940.0
+offset_right = 316.0
+offset_bottom = -433.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0oc6d")
+
+[node name="CardSlot" type="Node2D" parent="CropPanel2"]
+z_index = 1
+position = Vector2(294.778, 490)
+rotation = 0.159725
+scale = Vector2(0.981922, 0.981922)
+script = ExtResource("2_ugf26")
+
+[node name="WaveParent" type="Node" parent="CropPanel2/CardSlot"]
+script = ExtResource("2_ugf26")
+amplitude = 5.0
+freq = 0.5
+wave_type = 5
+metadata/_custom_type_script = "uid://btdfj3qvmr665"
+
+[node name="Back" type="Sprite2D" parent="CropPanel2/CardSlot"]
+visible = false
+rotation = 0.0196967
+scale = Vector2(0.621847, 0.621847)
+texture = ExtResource("6_3iq5n")
+
+[node name="Trait2" type="Sprite2D" parent="CropPanel2"]
+visible = false
+modulate = Color(0.1891, 0.338151, 0.243142, 1)
+z_index = 11
+position = Vector2(289, 508)
+rotation = 0.0144287
+scale = Vector2(0.693367, 1.33446)
+texture = ExtResource("20_3iq5n")
+
+[node name="CauldronBodyBack" type="Sprite2D" parent="."]
+position = Vector2(-17, -294)
+texture = ExtResource("13_u2oqt")
+
+[node name="CauldronSwirl" type="Sprite2D" parent="."]
+material = ExtResource("14_mm8ny")
+position = Vector2(-10, -507)
+texture = SubResource("ViewportTexture_mm8ny")
+
+[node name="SubViewPort" type="SubViewport" parent="."]
+own_world_3d = true
+transparent_bg = true
+size = Vector2i(400, 400)
+
+[node name="Whirpool" parent="SubViewPort" instance=ExtResource("14_k8qnq")]
+
+[node name="CauldronBubbles" type="AnimatedSprite2D" parent="."]
+visible = false
+material = ExtResource("14_mm8ny")
+position = Vector2(0, -115)
+scale = Vector2(1.564, 3.164)
+sprite_frames = SubResource("SpriteFrames_slwq5")
+autoplay = "default"
+frame_progress = 0.838118
+
+[node name="CauldronLogs" type="Sprite2D" parent="."]
+position = Vector2(-17, -29)
+texture = ExtResource("18_mm8ny")
+
+[node name="CauldronBodyFront" type="Sprite2D" parent="."]
+position = Vector2(-17, -294)
+texture = ExtResource("19_4ub0d")
+
+[node name="Bubbles" type="GPUParticles2D" parent="."]
+position = Vector2(9.05436, -432.067)
+scale = Vector2(1.99856, 1.99856)
+texture = ExtResource("9_ugf26")
+lifetime = 4.0
+process_material = SubResource("ParticleProcessMaterial_mtxp6")
+
+[node name="CauldronFire" type="AnimatedSprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.150637)
+material = SubResource("ShaderMaterial_50cmj")
+position = Vector2(-44, -20)
+scale = Vector2(1, 1e-05)
+sprite_frames = SubResource("SpriteFrames_5wtoo")
+autoplay = "default"
+frame_progress = 0.0111942
+offset = Vector2(22.0091, -134.695)
+
+[node name="CauldronFlames" type="AnimatedSprite2D" parent="."]
+position = Vector2(-2, -3)
+scale = Vector2(1.29294, 1.29294)
+sprite_frames = SubResource("SpriteFrames_jm38k")
+autoplay = "default"
+frame_progress = 0.825253
+offset = Vector2(0, -176.032)
+
+[node name="RomanNumeralDisplay" parent="." instance=ExtResource("27_7ygxk")]
+visible = false
+offset_top = -325.0
+offset_bottom = -325.0
+scale = Vector2(0.239269, 0.261864)
+
+[node name="CraftUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -200.0
+offset_top = -203.0
+offset_right = 200.0
+offset_bottom = -3.0
+
+[node name="CraftButton" type="Button" parent="CraftUI"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.294118)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -222.0
+offset_right = 100.0
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(100, 82)
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+disabled = true
+icon = ExtResource("26_7ygxk")
+flat = true
+icon_alignment = 1
+
+[node name="LoopScaleParent" type="Node" parent="CraftUI/CraftButton"]
+script = ExtResource("27_nrcd4")
+play_animation = false
+min_scale = 0.95
+max_scale = 1.05
+speed = 0.75
+metadata/_custom_type_script = "uid://74tqptfpc13w"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_v80va")
+}
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="area_exited" from="." to="." method="_on_area_exited"]
+[connection signal="pressed" from="CraftUI/CraftButton" to="." method="_on_craft_button_pressed"]
