@@ -8,14 +8,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Merriweather:wght@300;400;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <img src="images/studio_logo.png" alt="Misaligned Games" class="header-logo">
+        <img src="images/studio_logo_blackonwhite.png" alt="Misaligned Games" class="header-logo">
         <nav>
-            <a href="#game">Entropedia</a>
             <a href="#about">About</a>
             <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
         </nav>
@@ -23,13 +22,12 @@
 
     <main>
         <section class="hero">
-            <img src="images/studio_logo.png" alt="Misaligned Games" class="hero-logo">
+            <div class="diy-logo hero-logo" id="heroLogo"></div>
             <h1>Games that go a bit <span class="sideways">sideways</span></h1>
-            <p class="tagline">An indie studio making games with mechanics that haven't been tried before.</p>
             <div class="cta-group">
-                <a href="#game" class="btn btn-primary">See what we're making</a>
-                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-secondary">Play the demo</a>
+                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">Play the demo</a>
             </div>
+            <a href="#game" class="scroll-hint">DISCOVER <span class="arrow">&#8595;</span></a>
         </section>
 
         <div class="divider"></div>
@@ -37,14 +35,14 @@
         <section class="game-section" id="game">
             <div class="game-header">
                 <img src="images/Entropedia_logo.png" alt="Entropedia" class="game-logo">
-                <p class="game-sub">Generative PvP Deckbuilder</p>
+                <p class="game-sub">Procedural PvP Deckbuilder</p>
                 <p class="game-desc">Every card is procedurally crafted. Throw ingredients into the cauldron, discover unique combinations, and battle with a deck no one else has.</p>
             </div>
 
             <div class="cauldron-craft">
                 <div class="craft-inputs">
                     <img src="images/cards_widget/FullMoon.png" alt="Full Moon" class="craft-card craft-card-1">
-                    <img src="images/cards_widget/Wolf.png" alt="Wolf" class="craft-card craft-card-2">
+                    <img src="images/cards_widget/Wolf.jpg" alt="Wolf" class="craft-card craft-card-2">
                 </div>
 
                 <img src="images/cards_widget/arrow_craft.png" alt="" class="craft-arrow">
@@ -53,7 +51,7 @@
                     <img src="images/cauldron/cauldron_logs.png" class="c-layer c-logs" alt="">
                     <img src="images/cauldron/fire/CauldronFire1.png" class="c-layer c-fire" alt="" id="cauldronFire">
                     <img src="images/cauldron/CauldronBack.png" class="c-layer c-back" alt="">
-                    <canvas class="c-layer c-swirl" width="220" height="110"></canvas>
+                    <canvas class="c-layer c-swirl" width="178" height="90"></canvas>
                     <img src="images/cauldron/CauldronFront.png" class="c-layer c-front" alt="">
                     <img src="images/cauldron/CauldronSmoke1.png" class="c-layer c-smoke" id="smoke1" alt="">
                     <img src="images/cauldron/CauldronSmoke2.png" class="c-layer c-smoke" id="smoke2" alt="">
@@ -65,7 +63,6 @@
             <div class="screenshots">
                 <div class="screenshot"><img src="images/Screenshot1.webp" alt="Card crafting"></div>
                 <div class="screenshot"><img src="images/Screenshot2.webp" alt="PvP battle"></div>
-                <div class="screenshot"><img src="images/Screenshot3.webp" alt="Progression"></div>
                 <div class="screenshot"><img src="images/Screenshot4.webp" alt="Adventure"></div>
             </div>
 
@@ -99,7 +96,7 @@
     </main>
 
     <footer>
-        <img src="images/studio_logo.png" alt="Misaligned Games" class="footer-logo">
+        <img src="images/studio_logo_blackonwhite.png" alt="Misaligned Games" class="footer-logo">
         <div class="footer-links">
             <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
             <a href="mailto:contact@misaligned.games">Contact</a>
@@ -108,5 +105,22 @@
     </footer>
 
     <script src="js/cauldron.js"></script>
+    <script src="js/logo.js"></script>
+    <script>
+    (function() {
+        const el = document.querySelector('.sideways');
+        if (!el) return;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    el.style.animation = 'none';
+                    el.offsetHeight;
+                    el.style.animation = '';
+                }
+            });
+        }, { threshold: 0.5 });
+        observer.observe(el);
+    })();
+    </script>
 </body>
 </html>

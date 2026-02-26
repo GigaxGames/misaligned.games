@@ -1,8 +1,9 @@
 :root {
-    --bg: #111010;
-    --text: #e8e2d6;
-    --text-dim: #9a9488;
-    --accent: #e8a849;
+    --bg: #f8f6f3;
+    --bg-header: #f8f6f3;
+    --text: #262320;
+    --text-dim: #6a655c;
+    --accent: #d4892a;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,11 +26,11 @@ header {
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+    background: linear-gradient(to bottom, var(--bg-header) 60%, transparent);
 }
 
 .header-logo {
-    height: 32px;
+    height: 64px;
     width: auto;
     opacity: 0.85;
     transition: opacity 0.3s;
@@ -50,6 +51,7 @@ nav a:hover { color: var(--text); }
 
 /* Hero */
 .hero {
+    position: relative;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -59,9 +61,31 @@ nav a:hover { color: var(--text); }
     padding: 8rem 2rem 4rem;
 }
 
+/* DIY Logo */
+.diy-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    font-family: 'Montserrat', sans-serif;
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    margin-left: var(--row-offset, 0);
+}
+.logo-letter {
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text);
+    transform-origin: center center;
+    cursor: default;
+}
+
 .hero-logo {
-    width: min(500px, 85vw);
-    height: auto;
+    font-size: clamp(3.2rem, 10vw, 6.5rem);
     margin-bottom: 1.5rem;
 }
 
@@ -75,17 +99,16 @@ nav a:hover { color: var(--text); }
 
 .hero h1 .sideways {
     display: inline-block;
-    font-family: 'Merriweather', sans-serif;
+    font-family: 'Merriweather', serif;
     font-weight: 400;
     color: var(--accent);
-    animation: tiltSideways 4s ease-in-out infinite;
-    transform-origin: center bottom;
+    transform-origin: 5% 70%;
+    animation: sideDrop 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
 }
 
-@keyframes tiltSideways {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(3deg); }
-    75% { transform: rotate(-3deg); }
+@keyframes sideDrop {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(14deg); }
 }
 
 .hero .tagline {
@@ -111,10 +134,33 @@ nav a:hover { color: var(--text); }
 }
 .btn-primary { background: var(--accent); color: var(--bg); }
 .btn-primary:hover { filter: brightness(1.15); transform: translateY(-2px); }
-.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid #333; }
+.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid #c5c0b8; }
 .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
 
-.divider { width: 60px; height: 1px; background: #333; margin: 0 auto; }
+.scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--accent);
+    font-family: 'Jaro', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    opacity: 0.85;
+    transition: opacity 0.3s, transform 0.3s;
+    animation: scrollBounce 2.5s ease-in-out infinite;
+}
+.scroll-hint:hover { opacity: 1; transform: scale(1.05); }
+.scroll-hint .arrow { font-size: 1.8rem; }
+@keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+
+.divider { width: 60px; height: 1px; background: #d0ccc5; margin: 0 auto; }
 
 /* Game Section */
 .game-section {
@@ -155,9 +201,10 @@ nav a:hover { color: var(--text); }
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 2.5rem;
     margin: 4rem auto;
     flex-wrap: wrap;
+    padding-left: 3rem;
 }
 
 .craft-inputs {
@@ -171,7 +218,8 @@ nav a:hover { color: var(--text); }
     width: 130px;
     height: auto;
     transition: transform 0.4s;
-    clip-path: inset(4% 4% 2% 4% round 10px);
+    background: var(--bg);
+    border-radius: 10px;
 }
 .craft-card:hover { transform: scale(1.06); }
 .craft-card-1 { transform: rotate(-5deg); }
@@ -203,22 +251,22 @@ nav a:hover { color: var(--text); }
 .c-back  { bottom: 25px; width: 250px; z-index: 2; }
 
 .c-swirl {
-    bottom: 160px;
-    width: 220px;
-    height: 110px;
+    bottom: 168px;
+    width: 178px;
+    height: 90px;
     z-index: 3;
     border-radius: 50%;
     overflow: hidden;
 }
 
 .c-front { bottom: 25px; width: 250px; z-index: 4; }
-.c-fire  { bottom: 2px; width: 260px; z-index: 5; opacity: 0.85; }
+.c-fire  { bottom: -16px; width: 260px; z-index: 5; opacity: 0.85; }
 
 .c-smoke {
-    bottom: 200px;
-    width: 400px;
+    bottom: 160px;
+    width: 560px;
     opacity: 0;
-    z-index: 8;
+    z-index: 6;
     pointer-events: none;
 }
 
@@ -226,7 +274,8 @@ nav a:hover { color: var(--text); }
     width: 140px;
     z-index: 7;
     bottom: 280px;
-    clip-path: inset(4% 4% 2% 4% round 10px);
+    background: var(--bg);
+    border-radius: 10px;
     animation: resultFloat 4s ease-in-out infinite;
     filter: drop-shadow(0 0 20px rgba(232, 168, 73, 0.3));
 }
@@ -239,7 +288,7 @@ nav a:hover { color: var(--text); }
 /* Screenshots */
 .screenshots {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin: 4rem 0 2rem;
 }
@@ -309,12 +358,12 @@ nav a:hover { color: var(--text); }
 footer {
     padding: 3rem 2rem;
     text-align: center;
-    border-top: 1px solid #222;
+    border-top: 1px solid #d0ccc5;
 }
 
 .footer-logo {
-    height: 28px;
-    opacity: 0.5;
+    height: 56px;
+    opacity: 0.7;
     margin-bottom: 1rem;
 }
 
@@ -332,24 +381,26 @@ footer {
 }
 .footer-links a:hover { color: var(--text); }
 
-.footer-copy { font-size: 0.8rem; color: #555; }
+.footer-copy { font-size: 0.8rem; color: #9a9488; }
 
 /* Responsive */
 @media (max-width: 768px) {
     header { padding: 1rem; }
-    .header-logo { height: 26px; }
+    .header-logo { height: 48px; }
     nav a { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
     .hero-logo { width: min(340px, 80vw); }
+    .cauldron-craft { padding-left: 0; }
     .cauldron-scene { width: 260px; height: 360px; }
     .c-logs { width: 200px; }
-    .c-fire { width: 200px; bottom: 14px; }
+    .c-fire { width: 200px; bottom: -6px; }
     .c-back, .c-front { width: 190px; bottom: 20px; }
-    .c-swirl { width: 170px; height: 85px; bottom: 125px; }
-    .c-smoke { width: 300px; bottom: 155px; }
+    .c-swirl { width: 140px; height: 70px; bottom: 132px; }
+    .c-smoke { width: 420px; bottom: 120px; }
     .c-result { width: 105px; bottom: 215px; }
     .craft-card { width: 100px; }
-    .craft-arrow { width: 24px; }
+    .craft-arrow { width: 36px; }
     .game-section { padding: 4rem 1.5rem; }
+    .screenshots { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
