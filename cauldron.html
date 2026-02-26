@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cauldron Debug</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        .debug-title {
+            font-family: 'Jaro', sans-serif;
+            color: var(--accent);
+            font-size: 1.4rem;
+        }
+        .debug-grid {
+            display: flex;
+            gap: 4rem;
+            align-items: flex-start;
+        }
+        .debug-box {
+            border: 1px dashed #333;
+            padding: 1rem;
+        }
+        .debug-box h3 {
+            font-family: 'Jaro', sans-serif;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="debug-title">Cauldron + Craft Debug</h1>
+
+    <div class="debug-grid">
+        <div class="debug-box">
+            <h3>Cauldron (isolated)</h3>
+            <div class="cauldron-scene">
+                <img src="images/cauldron/cauldron_logs.png" class="c-layer c-logs" alt="">
+                <img src="images/cauldron/fire/CauldronFire1.png" class="c-layer c-fire" alt="" id="cauldronFire">
+                <img src="images/cauldron/CauldronBack.png" class="c-layer c-back" alt="">
+<canvas class="c-layer c-swirl" width="178" height="90"></canvas>
+                <img src="images/cauldron/CauldronFront.png" class="c-layer c-front" alt="">
+                    <img src="images/cauldron/CauldronSmoke1.png" class="c-layer c-smoke" id="smoke1" alt="">
+                    <img src="images/cauldron/CauldronSmoke2.png" class="c-layer c-smoke" id="smoke2" alt="">
+                    <img src="images/cauldron/CauldronSmoke3.png" class="c-layer c-smoke" id="smoke3" alt="">
+                </div>
+        </div>
+
+        <div class="debug-box">
+            <h3>Full composition</h3>
+            <div class="cauldron-craft">
+                <div class="craft-inputs">
+                    <img src="images/cards_widget/FullMoon.png" alt="Full Moon" class="craft-card craft-card-1">
+                    <img src="images/cards_widget/Wolf.jpg" alt="Wolf" class="craft-card craft-card-2">
+                </div>
+                <img src="images/cards_widget/arrow_craft.png" alt="" class="craft-arrow">
+                <div class="cauldron-scene">
+                    <img src="images/cauldron/cauldron_logs.png" class="c-layer c-logs" alt="">
+                    <img src="images/cauldron/fire/CauldronFire1.png" class="c-layer c-fire" alt="" id="cauldronFire2">
+                    <img src="images/cauldron/CauldronBack.png" class="c-layer c-back" alt="">
+                    <canvas class="c-layer c-swirl" width="178" height="90"></canvas>
+                    <img src="images/cauldron/CauldronFront.png" class="c-layer c-front" alt="">
+                    <img src="images/cauldron/CauldronSmoke1.png" class="c-layer c-smoke" id="smoke4" alt="">
+                    <img src="images/cauldron/CauldronSmoke2.png" class="c-layer c-smoke" id="smoke5" alt="">
+                    <img src="images/cauldron/CauldronSmoke3.png" class="c-layer c-smoke" id="smoke6" alt="">
+                    <img src="images/cards_widget/Werewolf.png" alt="Werewolf" class="c-layer c-result">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/cauldron.js"></script>
+</body>
+</html>

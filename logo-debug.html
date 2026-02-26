@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Debug</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #262320;
+            color: #e8e2d6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .logo-lab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5rem;
+            padding: 4rem 2rem;
+        }
+        h3 {
+            font-size: 0.85rem;
+            color: #9a9488;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .diy-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+        .logo-row {
+            display: flex;
+            align-items: center;
+            line-height: 1;
+            margin-left: var(--row-offset, 0);
+        }
+        .logo-letter {
+            display: inline-block;
+            font-weight: 800;
+            text-transform: uppercase;
+            animation: wobble var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+            transform-origin: center center;
+        }
+        @keyframes wobble {
+            0%, 100% { transform: rotate(var(--rot)) translateY(var(--ty)) scale(var(--sc, 1)); }
+            30%      { transform: rotate(calc(var(--rot) + var(--wobble-r, 2deg))) translateY(calc(var(--ty) + var(--wobble-y, -2px))) scale(var(--sc, 1)); }
+            70%      { transform: rotate(calc(var(--rot) - var(--wobble-r, 2deg))) translateY(calc(var(--ty) - var(--wobble-y, -2px))) scale(var(--sc, 1)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-lab">
+        <h3>DIY Logo Debug</h3>
+        <div class="diy-logo" id="logo1" style="font-size: 5rem;"></div>
+
+        <h3>Smaller variant</h3>
+        <div class="diy-logo" id="logo2" style="font-size: 2.5rem;"></div>
+
+        <h3>White on dark, bigger</h3>
+        <div class="diy-logo" id="logo3" style="font-size: 7rem;"></div>
+    </div>
+
+    <script>
+    // Wave-based Y offsets: smooth sine curve across each word
+    function wave(i, len, amp) {
+        return Math.sin((i / (len - 1)) * Math.PI * 1.8 + 0.5) * amp;
+    }
+
+    const LETTERS = [
+        { word: 'MISALIGNED', rowOffset: '-0.1em', letters: [
+            { rot: -4,  sc: 1.0,  sp: -0.06 },  // M
+            { rot: 2,   sc: 0.82, sp: -0.05 },  // I
+            { rot: -2,  sc: 0.92, sp: -0.06 },  // S
+            { rot: 5,   sc: 0.95, sp: -0.05 },  // A
+            { rot: -6,  sc: 0.9,  sp: -0.22 },  // L - tight, I tucks in
+            { rot: 5,   sc: 0.78, sp: -0.05, tyOverride: -0.18 },  // I - smaller, higher, left
+            { rot: -4,  sc: 0.98, sp: -0.06 },  // G
+            { rot: 5,   sc: 1.02, sp: -0.05 },  // N
+            { rot: -3,  sc: 0.9,  sp: -0.06 },  // E
+            { rot: 7,   sc: 1.06, sp: 0 },      // D
+        ]},
+        { word: 'GAMES', rowOffset: '0.25em', letters: [
+            { rot: 4,   sc: 1.04, sp: 0.02 },   // G
+            { rot: -4,  sc: 0.92, sp: 0.01 },   // A
+            { rot: 3,   sc: 1.06, sp: 0.02 },   // M
+            { rot: -5,  sc: 0.85, sp: 0.01 },   // E
+            { rot: 4,   sc: 0.98, sp: 0 },      // S
+        ]},
+    ];
+
+    // Inject wave-based ty into each letter (unless overridden)
+    LETTERS.forEach(row => {
+        const len = row.letters.length;
+        row.letters.forEach((l, i) => {
+            if (l.tyOverride !== undefined) {
+                l.ty = l.tyOverride;
+            } else {
+                l.ty = wave(i, len, 0.15);
+            }
+        });
+    });
+
+    function buildLogo(container) {
+        LETTERS.forEach(({ word, letters, rowOffset }) => {
+            const row = document.createElement('div');
+            row.className = 'logo-row';
+            row.style.setProperty('--row-offset', rowOffset || '0');
+            word.split('').forEach((ch, i) => {
+                const s = letters[i];
+                const span = document.createElement('span');
+                span.className = 'logo-letter';
+                span.textContent = ch;
+                span.style.setProperty('--rot', s.rot + 'deg');
+                span.style.setProperty('--ty', s.ty + 'em');
+                span.style.setProperty('--sc', s.sc);
+                span.style.marginRight = s.sp + 'em';
+                const wobbleR = (0.5 + Math.random() * 1);
+                const wobbleY = (0.5 + Math.random() * 1.5);
+                span.style.setProperty('--wobble-r', wobbleR + 'deg');
+                span.style.setProperty('--wobble-y', wobbleY + 'px');
+                span.style.setProperty('--dur', (3.5 + Math.random() * 3) + 's');
+                span.style.setProperty('--delay', (Math.random() * -4) + 's');
+                row.appendChild(span);
+            });
+            container.appendChild(row);
+        });
+    }
+
+    buildLogo(document.getElementById('logo1'));
+    buildLogo(document.getElementById('logo2'));
+    buildLogo(document.getElementById('logo3'));
+    </script>
+</body>
+</html>
