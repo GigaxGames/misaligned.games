@@ -1,9 +1,10 @@
 :root {
-    --bg: #f8f6f3;
-    --bg-header: #f8f6f3;
-    --text: #262320;
-    --text-dim: #6a655c;
+    --bg: #1a1410;
+    --bg-header: #1a1410;
+    --text: #ede4d8;
+    --text-dim: #9a8b78;
     --accent: #d4892a;
+    --border: #3a3028;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,6 +60,16 @@ nav a:hover { color: var(--text); }
     align-items: center;
     text-align: center;
     padding: 8rem 2rem 4rem;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../images/LabBackground.png') center/cover no-repeat;
+    filter: blur(12px) brightness(0.3);
+    transform: scale(1.05);
+    z-index: -1;
 }
 
 /* DIY Logo */
@@ -134,7 +145,7 @@ nav a:hover { color: var(--text); }
 }
 .btn-primary { background: var(--accent); color: var(--bg); }
 .btn-primary:hover { filter: brightness(1.15); transform: translateY(-2px); }
-.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid #c5c0b8; }
+.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
 .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); }
 
 .scroll-hint {
@@ -160,7 +171,7 @@ nav a:hover { color: var(--text); }
     50% { transform: translateY(6px); }
 }
 
-.divider { width: 60px; height: 1px; background: #d0ccc5; margin: 0 auto; }
+.divider { width: 60px; height: 1px; background: var(--border); margin: 0 auto; }
 
 /* Game Section */
 .game-section {
@@ -203,7 +214,6 @@ nav a:hover { color: var(--text); }
     justify-content: center;
     gap: 2.5rem;
     margin: 4rem auto;
-    flex-wrap: wrap;
     padding-left: 3rem;
 }
 
@@ -277,7 +287,7 @@ nav a:hover { color: var(--text); }
     background: var(--bg);
     border-radius: 10px;
     animation: resultFloat 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 20px rgba(232, 168, 73, 0.3));
+    filter: drop-shadow(0 0 24px rgba(232, 168, 73, 0.45));
 }
 
 @keyframes resultFloat {
@@ -297,6 +307,7 @@ nav a:hover { color: var(--text); }
     border-radius: 10px;
     overflow: hidden;
     transition: transform 0.3s;
+    border: 1px solid var(--border);
 }
 .screenshot:hover { transform: scale(1.02); }
 .screenshot img {
@@ -358,7 +369,7 @@ nav a:hover { color: var(--text); }
 footer {
     padding: 3rem 2rem;
     text-align: center;
-    border-top: 1px solid #d0ccc5;
+    border-top: 1px solid var(--border);
 }
 
 .footer-logo {
@@ -381,7 +392,7 @@ footer {
 }
 .footer-links a:hover { color: var(--text); }
 
-.footer-copy { font-size: 0.8rem; color: #9a9488; }
+.footer-copy { font-size: 0.8rem; color: var(--text-dim); }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -389,7 +400,19 @@ footer {
     .header-logo { height: 48px; }
     nav a { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
     .hero-logo { width: min(340px, 80vw); }
-    .cauldron-craft { padding-left: 0; }
+    .cauldron-craft {
+        padding-left: 0;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .craft-inputs {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    .craft-arrow {
+        width: 36px;
+        transform: rotate(180deg);
+    }
     .cauldron-scene { width: 260px; height: 360px; }
     .c-logs { width: 200px; }
     .c-fire { width: 200px; bottom: -6px; }
@@ -398,11 +421,22 @@ footer {
     .c-smoke { width: 420px; bottom: 120px; }
     .c-result { width: 105px; bottom: 215px; }
     .craft-card { width: 100px; }
-    .craft-arrow { width: 36px; }
     .game-section { padding: 4rem 1.5rem; }
     .screenshots { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
-    .cauldron-craft { flex-direction: column; }
+    .hero h1 { font-size: 1.5rem; }
+    .hero .tagline { font-size: 0.85rem; }
+    .game-section { padding: 3rem 1rem; }
+    .cauldron-craft { gap: 1rem; }
+    .cauldron-scene { width: 220px; height: 300px; }
+    .c-logs { width: 170px; }
+    .c-fire { width: 170px; bottom: -5px; }
+    .c-back, .c-front { width: 160px; bottom: 16px; }
+    .c-swirl { width: 118px; height: 58px; bottom: 110px; }
+    .c-smoke { width: 350px; bottom: 100px; }
+    .c-result { width: 88px; bottom: 180px; }
+    .craft-card { width: 85px; }
+    .craft-arrow { width: 30px; }
 }
