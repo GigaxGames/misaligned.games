@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropedia — Show & Tell</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c842;
+    --blue: #5b9cf6;
+    --green: #4ecca3;
+    --red: #f06680;
+    --purple: #a78bfa;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+    --w: 1100px;
+    --h: 660px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #05050d;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; user-select: none;
+  }
+  #deck { position:relative; width:var(--w); height:var(--h); }
+
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 60px 72px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateX(50px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .slide.active   { opacity:1; pointer-events:all; transform:translateX(0); }
+  .slide.exit     { opacity:0; transform:translateX(-50px); pointer-events:none; }
+
+  /* top accent */
+  .accent {
+    position: absolute; top:0; left:72px; right:72px; height:3px;
+    border-radius: 0 0 3px 3px;
+  }
+  .accent.gold   { background: linear-gradient(90deg, var(--gold), transparent); }
+  .accent.blue   { background: linear-gradient(90deg, var(--blue), transparent); }
+  .accent.purple { background: linear-gradient(90deg, var(--purple), transparent); }
+  .accent.red    { background: linear-gradient(90deg, var(--red), transparent); }
+
+  /* progress */
+  #progress { position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0; overflow:hidden; z-index:10; }
+  #bar { height:100%; background:var(--gold); transition:width .35s ease; }
+
+  /* type */
+  .label { font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .label.gold   { color:var(--gold); }
+  .label.blue   { color:var(--blue); }
+  .label.purple { color:var(--purple); }
+  .label.red    { color:var(--red); }
+
+  h1 { font-size:54px; font-weight:700; line-height:1.08; letter-spacing:-.025em; }
+  h2 { font-size:38px; font-weight:700; line-height:1.1; letter-spacing:-.02em; }
+
+  .big { font-size:80px; font-weight:900; line-height:1; letter-spacing:-.04em; }
+  .sub { font-size:15px; color:var(--muted); margin-top:6px; }
+
+  .ghost { font-size:180px; font-weight:900; line-height:1; letter-spacing:-.05em; opacity:.04; position:absolute; right:48px; bottom:20px; }
+
+  /* layout */
+  .grow { flex:1; }
+  .cols { display:flex; gap:20px; flex:1; min-height:0; }
+  .col  { flex:1; display:flex; flex-direction:column; gap:16px; }
+  .gap  { height:24px; }
+  .gap-sm { height:14px; }
+
+  /* stat row */
+  .stats { display:flex; gap:16px; }
+  .stat {
+    flex:1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 16px;
+    text-align: center;
+  }
+  .stat-n { font-size:44px; font-weight:800; line-height:1; letter-spacing:-.03em; }
+  .stat-l { font-size:11px; color:var(--muted); margin-top:6px; text-transform:uppercase; letter-spacing:.05em; }
+  .gold  { color:var(--gold); }
+  .blue  { color:var(--blue); }
+  .green { color:var(--green); }
+  .red   { color:var(--red); }
+  .purple{ color:var(--purple); }
+
+  /* quote */
+  .quote {
+    border-left: 3px solid var(--gold);
+    padding: 10px 16px;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--text);
+    background: var(--surface2);
+    border-radius: 0 8px 8px 0;
+  }
+  .quote.blue   { border-color:var(--blue); }
+  .quote.purple { border-color:var(--purple); }
+
+  /* pill */
+  .pill {
+    display:inline-block; font-size:11px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:3px 10px; border-radius:20px;
+  }
+  .pill.gold   { background:rgba(245,200,66,.12); color:var(--gold);   border:1px solid rgba(245,200,66,.25); }
+  .pill.blue   { background:rgba(91,156,246,.12); color:var(--blue);   border:1px solid rgba(91,156,246,.25); }
+  .pill.green  { background:rgba(78,204,163,.12); color:var(--green);  border:1px solid rgba(78,204,163,.25); }
+  .pill.red    { background:rgba(240,102,128,.12);color:var(--red);    border:1px solid rgba(240,102,128,.25); }
+  .pill.purple { background:rgba(167,139,250,.12);color:var(--purple); border:1px solid rgba(167,139,250,.25); }
+
+  /* card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .card.gold   { border-color:rgba(245,200,66,.2);  background:linear-gradient(135deg,rgba(245,200,66,.05),var(--surface)); }
+  .card.blue   { border-color:rgba(91,156,246,.2);  background:linear-gradient(135deg,rgba(91,156,246,.05),var(--surface)); }
+  .card.red    { border-color:rgba(240,102,128,.2); background:linear-gradient(135deg,rgba(240,102,128,.05),var(--surface)); }
+  .card.purple { border-color:rgba(167,139,250,.2); background:linear-gradient(135deg,rgba(167,139,250,.05),var(--surface)); }
+
+  /* image placeholder */
+  .img {
+    background: var(--surface2);
+    border: 1px dashed rgba(255,255,255,.1);
+    border-radius: 10px;
+    display: flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:8px;
+    color: var(--muted); font-size:13px;
+  }
+  .img svg { opacity:.25; }
+
+  /* nav */
+  #nav { margin-top:20px; display:flex; align-items:center; gap:20px; }
+  .btn {
+    width:40px; height:40px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--muted); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .2s; font-size:16px;
+  }
+  .btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.1); }
+  .btn:disabled { opacity:.2; cursor:default; }
+  .btn:disabled:hover { border-color:var(--border); color:var(--muted); background:var(--surface); }
+  #counter { font-size:13px; color:var(--muted); min-width:56px; text-align:center; }
+  .pips { display:flex; gap:6px; align-items:center; }
+  .pip {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--surface2); border:1px solid rgba(255,255,255,.12);
+    cursor:pointer; transition:all .2s;
+  }
+  .pip.on { background:var(--gold); border-color:var(--gold); width:18px; border-radius:3px; }
+
+  /* vs */
+  .vs { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; padding:0 8px; }
+  .vs-line { width:1px; flex:1; background:var(--border); }
+
+  /* title glow */
+  #s0 .glow { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(245,200,66,.07) 0%,transparent 70%); top:-200px; right:-100px; pointer-events:none; }
+  #s0 { justify-content:flex-end; }
+
+  .wordmark { font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="deck">
+  <div id="progress"><div id="bar"></div></div>
+
+  <!-- 0 · TITLE -->
+  <div class="slide active" id="s0">
+    <div class="glow"></div>
+    <div class="accent gold"></div>
+    <img src="img/slide1.jpg" style="position:absolute;right:0;top:0;bottom:0;height:100%;width:55%;object-fit:cover;object-position:center;border-radius:0 16px 16px 0;opacity:.65;">
+    <div style="position:absolute;right:0;top:0;bottom:0;width:55%;background:linear-gradient(90deg,var(--bg) 0%,transparent 45%);border-radius:0 16px 16px 0;"></div>
+    <div class="grow"></div>
+    <div class="label gold">Entropedia · April 2026</div>
+    <h1>Show &amp; Tell</h1>
+    <div class="gap-sm"></div>
+    <div style="display:flex;gap:40px;margin-top:8px;">
+      <div><div class="label">Playtesters</div><span class="big gold" style="font-size:48px;">9</span></div>
+      <div><div class="label">Sessions (mn)</div><span class="big gold" style="font-size:48px;">30–45</span></div>
+      <div><div class="label">Game modes</div><span class="big gold" style="font-size:48px;">3</span></div>
+    </div>
+    <div style="height:52px"></div>
+    <div class="wordmark" style="position:absolute;top:60px;right:72px;">Supercell</div>
+  </div>
+
+  <!-- 1 · AGENDA -->
+  <div class="slide" id="s1">
+    <div class="accent gold"></div>
+    <div class="label">Today</div>
+    <h2>Three Hypotheses</h2>
+    <div class="gap"></div>
+    <div style="display:flex;flex-direction:column;gap:14px;flex:1;">
+      <div class="card gold" style="display:flex;gap:20px;align-items:center;">
+        <span style="font-size:30px;font-weight:900;color:var(--gold);opacity:.35;">01</span>
+        <div>
+          <div style="font-weight:600;font-size:17px;">NPCs &amp; quests make crafting more engaging</div>
+          <div style="margin-top:5px;"><span class="pill green">Confirmed</span> <span style="font-size:13px;color:var(--muted);margin-left:6px;">with a twist</span></div>
+        </div>
+      </div>
+      <div class="card blue" style="display:flex;gap:20px;align-items:center;">
+        <span style="font-size:30px;font-weight:900;color:var(--blue);opacity:.35;">02</span>
+        <div>
+          <div style="font-weight:600;font-size:17px;">Grid battle is a fun new game mode</div>
+          <div style="margin-top:5px;"><span class="pill gold">Fun but janky</span> <span style="font-size:13px;color:var(--muted);margin-left:6px;">needs investment</span></div>
+        </div>
+      </div>
+      <div class="card purple" style="display:flex;gap:20px;align-items:center;">
+        <span style="font-size:30px;font-weight:900;color:var(--purple);opacity:.35;">03</span>
+        <div>
+          <div style="font-weight:600;font-size:17px;">Semantic mode has a lot of potential</div>
+          <div style="margin-top:5px;"><span style="font-size:13px;color:var(--muted);">Semantic is fun</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · H1 HEADER -->
+  <div class="slide" id="s2">
+    <div class="accent gold"></div>
+    <div style="display:flex;flex:1;gap:28px;align-items:center;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+        <div class="label gold">Hypothesis 01</div>
+        <h1>NPCs &amp; quests make<br>crafting more <span class="gold">engaging</span></h1>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;width:580px;align-self:stretch;padding:4px 0;">
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="img/slide3.png" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;">
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="img/slide3.1.png" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · H1 DATA -->
+  <div class="slide" id="s3">
+    <div class="accent gold"></div>
+    <div class="label gold">Crafting</div>
+    <h2>The Numbers</h2>
+    <div class="gap"></div>
+    <div class="stats" style="margin-bottom:20px;">
+      <div class="stat"><div class="stat-n gold">9</div><div class="stat-l">playtesters</div></div>
+      <div class="stat"><div class="stat-n gold">30–45</div><div class="stat-l">mn each</div></div>
+      <div class="stat"><div class="stat-n green">&gt;50%</div><div class="stat-l">completed many quests</div></div>
+    </div>
+    <div class="quote">"It's addictive. I wanna craft more, can I keep playing?" — Akusti</div>
+    <div class="gap-sm"></div>
+    <div style="font-size:14px;color:var(--muted);padding:14px 18px;background:var(--surface2);border-radius:10px;">
+      💡 UI/UX frustration = <strong style="color:var(--text)">engagement signal</strong> — players were frustrated because they wanted to do <em>more</em>
+    </div>
+  </div>
+
+  <!-- 4 · ARCHETYPES -->
+  <div class="slide" id="s4">
+    <img src="img/slide5.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:16px;opacity:.25;">
+    <div class="accent gold"></div>
+    <div class="label gold">Crafting · Player Archetypes</div>
+    <h2>Two Types of Players</h2>
+    <div class="gap"></div>
+    <div style="display:flex;gap:20px;align-self:center;width:100%;">
+      <div class="card gold" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">🎯</span>
+          <div style="font-weight:700;font-size:18px;">Completionist</div>
+          <span class="pill gold" style="margin-left:auto;">Quest-first</span>
+        </div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.6;">Guided by NPCs. Motivated by unlocking cards. <strong style="color:var(--text)">Well served</strong> by the current system.</div>
+        <div class="quote">"I wanna make wood"</div>
+      </div>
+      <div class="card red" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">🎨</span>
+          <div style="font-weight:700;font-size:18px;">Creative</div>
+          <span class="pill red" style="margin-left:auto;">Free crafter</span>
+        </div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.6;">Ignores quests. Explores freely. Runs out of resources. <strong style="color:var(--red)">Not rewarded enough</strong> — forced to stop.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · DISCOVERY -->
+  <div class="slide" id="s5">
+    <div class="accent gold"></div>
+    <div class="label gold">Crafting · Core Hook</div>
+    <div class="cols" style="align-items:center;">
+      <div style="display:flex;flex-direction:column;gap:18px;flex:1;">
+        <h2>Discovering new cards<br>is the hook</h2>
+        <div class="quote">"VERY RARE? Nice!" — Kalvin</div>
+        <div class="quote">"hahaha fuck yeah" — Akusti</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:6px;">People love it — especially when their name is attached. But they want to <strong style="color:var(--text)">use</strong> what they've made.</div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <img src="img/slide6.png" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 · H2 HEADER -->
+  <div class="slide" id="s7">
+    <div class="accent blue"></div>
+    <div style="display:flex;flex:1;gap:28px;align-items:center;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+        <div class="label blue">Hypothesis 02</div>
+        <h1>Grid battle is a<br>fun <span class="blue">new mode</span></h1>
+      </div>
+      <img src="img/slide7.jpg" style="width:260px;align-self:stretch;object-fit:cover;border-radius:10px;">
+    </div>
+  </div>
+
+  <!-- 8 · GRID RESULTS -->
+  <div class="slide" id="s8">
+    <div class="accent blue"></div>
+    <div class="label blue">Grid Battle</div>
+    <h2>Fun... if you get it</h2>
+    <div class="gap"></div>
+    <div class="cols">
+      <div style="display:flex;flex-direction:column;gap:14px;flex:1;">
+        <div class="card blue" style="gap:8px;display:flex;flex-direction:column;">
+          <div style="font-weight:600;" class="blue">Core gameplay is solid</div>
+          <div style="font-size:15px;color:var(--muted);">Strategic depth. Patient players loved it. Us too — we played it a lot.</div>
+          <div class="quote blue" style="margin-top:4px;">"I like this" — Sven</div>
+        </div>
+        <div class="card red" style="gap:8px;display:flex;flex-direction:column;">
+          <div style="font-weight:600;" class="red">Built in 2 days — shows</div>
+          <div style="font-size:15px;color:var(--muted);">Most players never understood the rules. Too much cognitive load. Only 1 playtester got it.</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;">
+        <div style="flex:1;min-height:0;overflow:hidden;border-radius:10px;">
+          <img src="img/slide8.1.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+        <div style="flex:1;min-height:0;overflow:hidden;border-radius:10px;">
+          <img src="img/slide8.2.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 · H3 HEADER -->
+  <div class="slide" id="s9">
+    <div class="accent purple"></div>
+    <div style="display:flex;flex:1;gap:28px;align-items:center;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+        <div class="label purple">Hypothesis 03</div>
+        <h1>Semantic mode has<br>a lot of <span class="purple">potential</span></h1>
+      </div>
+      <img src="img/slide9.png" style="flex:1;align-self:stretch;object-fit:cover;border-radius:10px;max-width:420px;">
+    </div>
+  </div>
+
+  <!-- 10 · SEMANTIC RESULTS -->
+  <div class="slide" id="s10">
+    <div class="accent purple"></div>
+    <div class="label purple">Semantic Mode</div>
+    <h2>Semantic is fun</h2>
+    <div class="gap"></div>
+    <div style="display:flex;flex-direction:column;gap:16px;flex:1;">
+      <div class="card purple" style="gap:8px;display:flex;flex-direction:column;flex:1;">
+        <div style="font-weight:600;font-size:20px;" class="purple">Concept resonated despite bad UX</div>
+        <div style="font-size:18px;color:var(--muted);">Familiar mechanic — feels like crafting. Gentle learning curve.</div>
+      </div>
+      <div class="card red" style="gap:8px;display:flex;flex-direction:column;flex:1;">
+        <div style="font-weight:600;font-size:20px;" class="red">Needs work</div>
+        <div style="font-size:18px;color:var(--muted);">AI quality, UX clarity, crashes, bugs.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 · SUMMARY -->
+  <div class="slide" id="s11">
+    <div class="accent gold"></div>
+    <div class="label">Takeaways</div>
+    <h2>What We Learned</h2>
+    <div class="gap"></div>
+    <div style="display:flex;gap:24px;flex:1;min-height:0;">
+      <div style="display:flex;flex-direction:column;gap:12px;flex:1;">
+        <div style="padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:15px;border-left:3px solid var(--gold);">
+          ✅ <strong>Crafting + NPCs works</strong>
+        </div>
+        <div style="padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:15px;border-left:3px solid var(--blue);">
+          ⚡ <strong>Grid battle has a real core</strong>
+        </div>
+        <div style="padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:15px;border-left:3px solid var(--purple);">
+          🔮 <strong>Semantic is fun</strong>
+        </div>
+        <div style="padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:15px;border-left:3px solid var(--green);">
+          ⚡ <strong>Playtesting with vibe coding is super efficient</strong>
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <img src="img/slide11.png" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;">
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 12 · NEXT WEEK -->
+  <div class="slide" id="s12">
+    <div class="accent gold"></div>
+    <div class="label">Next Week</div>
+    <h2>Hypotheses</h2>
+    <div class="gap"></div>
+    <div style="display:flex;flex-direction:column;gap:16px;flex:1;">
+      <div class="card blue" style="display:flex;gap:20px;align-items:flex-start;flex:1;">
+        <span style="font-size:30px;font-weight:900;color:var(--blue);opacity:.35;margin-top:2px;">01</span>
+        <div>
+          <div style="font-weight:600;font-size:19px;">Grid battle needs better onboarding</div>
+          <div style="font-size:15px;color:var(--muted);margin-top:8px;">One more week before we kill it.</div>
+        </div>
+      </div>
+      <div class="card purple" style="display:flex;gap:20px;align-items:flex-start;flex:1;">
+        <span style="font-size:30px;font-weight:900;color:var(--purple);opacity:.35;margin-top:2px;">02</span>
+        <div>
+          <div style="font-weight:600;font-size:19px;">Semantic is a keeper</div>
+          <div style="font-size:15px;color:var(--muted);margin-top:8px;">Explore new semantic-related game modes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button class="btn" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="pips" id="pips"></div>
+  <div id="counter">1 / 12</div>
+  <button class="btn" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const pips = document.getElementById('pips');
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+const bp = document.getElementById('bp');
+const bn = document.getElementById('bn');
+const N = slides.length;
+let cur = 0;
+
+for (let i = 0; i < N; i++) {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i===0?' on':'');
+  p.onclick = () => goTo(i);
+  pips.appendChild(p);
+}
+
+function goTo(n) {
+  if (n < 0 || n >= N) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  setTimeout(() => slides[cur].classList.remove('exit'), 400);
+  cur = n;
+  slides[cur].classList.add('active');
+  pips.querySelectorAll('.pip').forEach((p,i) => p.classList.toggle('on', i===cur));
+  counter.textContent = (cur+1)+' / '+N;
+  bar.style.width = ((cur+1)/N*100)+'%';
+  bp.disabled = cur===0;
+  bn.disabled = cur===N-1;
+}
+
+function go(d) { goTo(cur+d); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') go(1);
+  if (e.key==='ArrowLeft') go(-1);
+});
+
+bar.style.width = (1/N*100)+'%';
+</script>
+</body>
+</html>

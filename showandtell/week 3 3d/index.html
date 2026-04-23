@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropedia — Show &amp; Tell Week 3 · 3D</title>
+<style>
+  :root {
+    --gold: #f5c842;
+    --blue: #5b9cf6;
+    --green: #4ecca3;
+    --red: #f06680;
+    --purple: #a78bfa;
+    --orange: #f59e42;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #03030a; color: #e8e8f0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  canvas { display: block; }
+
+  #hud {
+    position: fixed; bottom: 28px; left: 0; right: 0;
+    display: flex; justify-content: center; align-items: center; gap: 14px;
+    pointer-events: none; z-index: 10;
+  }
+  .pill {
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    padding: 10px 22px; border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px; color: #bbb; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  #counter strong { color: var(--gold); font-weight: 800; }
+
+  #progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    background: rgba(255,255,255,0.05); z-index: 10;
+  }
+  #progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--orange));
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 10px var(--gold);
+  }
+
+  #crosshair {
+    position: fixed; top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 9;
+    transition: all 0.2s;
+    mix-blend-mode: difference;
+  }
+  #crosshair.active {
+    width: 22px; height: 22px;
+    border-color: var(--gold);
+    box-shadow: 0 0 14px var(--gold);
+  }
+  #crosshair.active::after {
+    content: ''; position: absolute; inset: -8px;
+    border: 1px solid var(--gold); border-radius: 50%;
+    animation: ping 1s infinite;
+  }
+  @keyframes ping {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(1.6); }
+  }
+
+  #hint {
+    position: fixed; top: 24px; right: 24px;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(12px);
+    padding: 12px 18px; border-radius: 10px;
+    font-size: 12px; color: #aaa;
+    border: 1px solid rgba(255,255,255,0.06);
+    pointer-events: none; z-index: 10;
+    letter-spacing: 0.04em;
+    line-height: 1.8;
+  }
+  #hint kbd {
+    background: rgba(255,255,255,0.08);
+    padding: 2px 7px; border-radius: 4px;
+    margin: 0 2px; font-family: inherit;
+    color: var(--gold); font-size: 11px; font-weight: 600;
+  }
+
+  #loader {
+    position: fixed; inset: 0; background: #03030a;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 24px;
+    z-index: 100; transition: opacity 1s ease;
+  }
+  #loader.gone { opacity: 0; pointer-events: none; }
+  #loader h1 {
+    font-size: 40px; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--gold), var(--orange), var(--purple));
+    background-size: 200% 200%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 3s ease infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  #loader .bar { width: 260px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  #loader .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--orange)); transition: width .3s; }
+  #loader .sub { font-size: 11px; color: #555; letter-spacing: 0.2em; text-transform: uppercase; }
+
+  #start-btn {
+    margin-top: 10px;
+    padding: 12px 30px; border-radius: 30px;
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    color: #000; font-weight: 700; font-size: 14px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    border: none; cursor: pointer;
+    box-shadow: 0 8px 30px rgba(245,200,66,0.3);
+    transition: transform .2s, box-shadow .2s;
+    opacity: 0; pointer-events: none;
+  }
+  #start-btn.ready { opacity: 1; pointer-events: all; }
+  #start-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(245,200,66,0.45); }
+
+  #room-title {
+    position: fixed; top: 36px; left: 36px;
+    z-index: 10; pointer-events: none;
+    opacity: 0; transition: opacity .8s;
+  }
+  #room-title.show { opacity: 1; }
+  #room-title .label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #777; margin-bottom: 4px; }
+  #room-title .name { font-size: 14px; font-weight: 600; color: #ccc; letter-spacing: 0.02em; }
+
+  #pause-overlay {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    z-index: 50;
+    color: #ccc; font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  #pause-overlay.show { display: flex; }
+  #pause-overlay .big { font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: 0.25em; }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <h1>Entropedia · Show &amp; Tell</h1>
+  <div class="bar"><div class="fill" id="lfill"></div></div>
+  <div class="sub" id="lsub">Loading assets</div>
+  <button id="start-btn">Click to Enter</button>
+</div>
+
+<div id="progress"><div id="progress-fill"></div></div>
+
+<div id="crosshair"></div>
+
+<div id="hud">
+  <div class="pill" id="counter"><strong>1</strong> / 10</div>
+</div>
+
+<div id="room-title">
+  <div class="label">Chamber</div>
+  <div class="name" id="room-name">Title</div>
+</div>
+
+<div id="hint">
+  <kbd>WASD</kbd> move · <kbd>mouse</kbd> look<br>
+  <kbd>LMB</kbd> interact · <kbd>ESC</kbd> pause
+</div>
+
+<div id="pause-overlay">
+  <div class="big">Paused</div>
+  <div>Click to resume</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+/* =========================================================================
+   COLOR + ROOM CONFIG
+   ========================================================================= */
+const C = {
+  gold:   { hex: 0xf5c842, css: '#f5c842' },
+  blue:   { hex: 0x5b9cf6, css: '#5b9cf6' },
+  green:  { hex: 0x4ecca3, css: '#4ecca3' },
+  red:    { hex: 0xf06680, css: '#f06680' },
+  purple: { hex: 0xa78bfa, css: '#a78bfa' },
+  orange: { hex: 0xf59e42, css: '#f59e42' },
+};
+
+const ROOM_W = 22;
+const ROOM_H = 8;
+const ROOM_D = 22;
+const GAP = 6;
+const STEP = ROOM_D + GAP;
+const N_ROOMS = 10;
+const EYE_H = 1.7;
+
+const ROOM_NAMES = [
+  'Title', 'Two Hypotheses', 'Hypothesis A', 'Hive Playtests',
+  'Reworked Semantic', 'Hypothesis B', 'Reddit Posts', 'DAU Spike',
+  'More Game Modes', 'Retention',
+];
+
+const ROOM_THEMES = ['gold','gold','purple','purple','purple','orange','orange','green','blue','gold'];
+
+const roomZ = i => -i * STEP;
+
+/* =========================================================================
+   SCENE / CAMERA / RENDERER
+   ========================================================================= */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x05050d);
+scene.fog = new THREE.FogExp2(0x05050d, 0.035);
+
+const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.05, 400);
+camera.position.set(0, EYE_H, roomZ(0) + 9);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+document.body.appendChild(renderer.domElement);
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* =========================================================================
+   POINTER LOCK CONTROLS
+   ========================================================================= */
+const controls = new PointerLockControls(camera, renderer.domElement);
+scene.add(camera);
+
+const pauseOverlay = document.getElementById('pause-overlay');
+controls.addEventListener('lock', () => pauseOverlay.classList.remove('show'));
+controls.addEventListener('unlock', () => {
+  if (started) pauseOverlay.classList.add('show');
+});
+pauseOverlay.addEventListener('click', () => controls.lock());
+
+/* =========================================================================
+   LOADING MANAGER
+   ========================================================================= */
+const manager = new THREE.LoadingManager();
+const loader = new THREE.TextureLoader(manager);
+const loaderEl = document.getElementById('loader');
+const loaderFill = document.getElementById('lfill');
+const loaderSub = document.getElementById('lsub');
+const startBtn = document.getElementById('start-btn');
+
+manager.onProgress = (url, loaded, total) => {
+  loaderFill.style.width = Math.round((loaded / total) * 100) + '%';
+};
+manager.onLoad = () => {
+  loaderSub.textContent = 'Ready';
+  startBtn.classList.add('ready');
+};
+
+function loadTex(path) {
+  const t = loader.load(path);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+const IMG = '../week%203/img/';
+const tex_poster       = loadTex(IMG + 'poster.png');
+const tex_playtest     = loadTex(IMG + 'playtest%20hive.jpg');
+const tex_reddit_chat  = loadTex(IMG + 'reddit%20chatpgt%201.png');
+const tex_reddit_ai    = loadTex(IMG + 'reddit%20aigamedev.png');
+const tex_posthog      = loadTex(IMG + 'new%20users%20posthog.png');
+const tex_raid         = loadTex(IMG + 'raid%20mode.png');
+const tex_daily        = loadTex(IMG + 'daily%20challenge.png');
+
+const videoEl = document.createElement('video');
+videoEl.src = IMG + 'recording%20new%20semantic.mov';
+videoEl.loop = true;
+videoEl.muted = true;
+videoEl.playsInline = true;
+videoEl.crossOrigin = 'anonymous';
+const vtex = new THREE.VideoTexture(videoEl);
+vtex.colorSpace = THREE.SRGBColorSpace;
+
+/* =========================================================================
+   WEB AUDIO (procedural — no downloads).
+   Want real samples? Swap in Kenney "Interface Sounds" (CC0):
+   https://kenney.nl/assets/interface-sounds  — drop .ogg files in /sounds
+   ========================================================================= */
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Ambient drone
+  const drone = audioCtx.createOscillator();
+  drone.type = 'sine'; drone.frequency.value = 55;
+  const drone2 = audioCtx.createOscillator();
+  drone2.type = 'sine'; drone2.frequency.value = 82.5;
+  const droneGain = audioCtx.createGain();
+  droneGain.gain.value = 0.05;
+  const droneFilter = audioCtx.createBiquadFilter();
+  droneFilter.type = 'lowpass';
+  droneFilter.frequency.value = 400;
+  drone.connect(droneFilter); drone2.connect(droneFilter);
+  droneFilter.connect(droneGain).connect(audioCtx.destination);
+  drone.start(); drone2.start();
+
+  // Slow LFO on drone for life
+  const lfo = audioCtx.createOscillator();
+  lfo.frequency.value = 0.1;
+  const lfoGain = audioCtx.createGain();
+  lfoGain.gain.value = 0.02;
+  lfo.connect(lfoGain).connect(droneGain.gain);
+  lfo.start();
+}
+
+function noiseBuffer(duration) {
+  const sr = audioCtx.sampleRate;
+  const buf = audioCtx.createBuffer(1, sr * duration, sr);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return buf;
+}
+
+function playFootstep() {
+  if (!audioCtx) return;
+  const src = audioCtx.createBufferSource();
+  src.buffer = noiseBuffer(0.15);
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'bandpass';
+  filt.frequency.value = 180 + Math.random() * 80;
+  filt.Q.value = 3;
+  const g = audioCtx.createGain();
+  const now = audioCtx.currentTime;
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.15, now + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+  src.connect(filt).connect(g).connect(audioCtx.destination);
+  src.start(now); src.stop(now + 0.15);
+}
+
+function playReveal() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  // Whoosh
+  const src = audioCtx.createBufferSource();
+  src.buffer = noiseBuffer(0.6);
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'bandpass'; filt.Q.value = 2;
+  filt.frequency.setValueAtTime(400, now);
+  filt.frequency.exponentialRampToValueAtTime(4000, now + 0.4);
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.12, now + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+  src.connect(filt).connect(g).connect(audioCtx.destination);
+  src.start(now); src.stop(now + 0.55);
+  // Bell
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, now);
+  osc.frequency.exponentialRampToValueAtTime(440, now + 0.5);
+  const og = audioCtx.createGain();
+  og.gain.setValueAtTime(0.15, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+  osc.connect(og).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.85);
+}
+
+function playClick() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(1200, now);
+  osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.08, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.12);
+}
+
+function playDeny() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.value = 140;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.05, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.15);
+}
+
+function playZap() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  // Crackle
+  const src = audioCtx.createBufferSource();
+  src.buffer = noiseBuffer(0.5);
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'highpass';
+  filt.frequency.value = 2500;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.22, now + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+  src.connect(filt).connect(g).connect(audioCtx.destination);
+  src.start(now); src.stop(now + 0.45);
+  // Low thump
+  const osc = audioCtx.createOscillator();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(110, now);
+  osc.frequency.exponentialRampToValueAtTime(35, now + 0.15);
+  const og = audioCtx.createGain();
+  og.gain.setValueAtTime(0.18, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+  osc.connect(og).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.22);
+}
+
+function playJump() {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(320, now);
+  osc.frequency.exponentialRampToValueAtTime(560, now + 0.12);
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.08, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.16);
+}
+
+/* =========================================================================
+   CANVAS TEXTURE HELPERS
+   ========================================================================= */
+function makeCanvas(w, h, draw) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  draw(ctx, w, h);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y,     x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x,     y + h, r);
+  ctx.arcTo(x,     y + h, x,     y,     r);
+  ctx.arcTo(x,     y,     x + w, y,     r);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lh) {
+  const words = text.split(' ');
+  let line = '';
+  let yy = y;
+  for (let i = 0; i < words.length; i++) {
+    const test = line + words[i] + ' ';
+    if (ctx.measureText(test).width > maxW && line) {
+      ctx.fillText(line.trim(), x, yy);
+      yy += lh;
+      line = words[i] + ' ';
+    } else line = test;
+  }
+  ctx.fillText(line.trim(), x, yy);
+  return yy + lh;
+}
+
+function textTexture({ width=1024, height=256, label, title, titleSize=88, subtitle, subtitleSize=34, align='left', color='#fff', accent='#f5c842' }) {
+  return makeCanvas(width, height, (ctx, w, h) => {
+    ctx.clearRect(0, 0, w, h);
+    const pad = 40;
+    let y = pad;
+    if (label) {
+      ctx.fillStyle = accent;
+      ctx.font = '700 28px "Segoe UI", sans-serif';
+      ctx.textAlign = align;
+      ctx.textBaseline = 'top';
+      ctx.fillText(label.toUpperCase(), align==='center'? w/2 : pad, y);
+      y += 46;
+    }
+    if (title) {
+      ctx.fillStyle = color;
+      ctx.font = `900 ${titleSize}px "Segoe UI", sans-serif`;
+      ctx.textAlign = align;
+      ctx.textBaseline = 'top';
+      const lines = title.split('\n');
+      for (const l of lines) {
+        ctx.fillText(l, align==='center'? w/2 : pad, y);
+        y += titleSize * 1.05;
+      }
+    }
+    if (subtitle) {
+      y += 14;
+      ctx.fillStyle = '#a0a0b8';
+      ctx.font = `400 ${subtitleSize}px "Segoe UI", sans-serif`;
+      ctx.textAlign = align;
+      wrapText(ctx, subtitle, align==='center'? w/2 : pad, y, w - pad * 2, subtitleSize * 1.35);
+    }
+  });
+}
+
+function cardTexture({
+  width=800, height=400,
+  bg='#13131f', accent='#f5c842',
+  label, title, body, pill, stat, statLabel,
+}) {
+  return makeCanvas(width, height, (ctx, w, h) => {
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, bg);
+    grad.addColorStop(1, shade(bg, -8));
+    ctx.fillStyle = grad;
+    roundRect(ctx, 0, 0, w, h, 24); ctx.fill();
+
+    const tint = ctx.createLinearGradient(0, 0, w, h);
+    tint.addColorStop(0, accent + '14');
+    tint.addColorStop(1, accent + '00');
+    ctx.fillStyle = tint;
+    roundRect(ctx, 0, 0, w, h, 24); ctx.fill();
+
+    ctx.strokeStyle = accent + '66';
+    ctx.lineWidth = 3;
+    roundRect(ctx, 2, 2, w - 4, h - 4, 22); ctx.stroke();
+
+    ctx.fillStyle = accent;
+    roundRect(ctx, 32, 0, w * 0.32, 4, 2); ctx.fill();
+
+    const pad = 40;
+    let y = pad;
+
+    if (pill) {
+      ctx.font = '700 20px "Segoe UI", sans-serif';
+      const tw = ctx.measureText(pill.toUpperCase()).width;
+      ctx.fillStyle = accent + '28';
+      roundRect(ctx, pad, y, tw + 28, 34, 17); ctx.fill();
+      ctx.strokeStyle = accent + '88'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = accent;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pill.toUpperCase(), pad + 14, y + 18);
+      y += 56;
+    }
+
+    if (label) {
+      ctx.fillStyle = accent;
+      ctx.font = '700 22px "Segoe UI", sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.fillText(label.toUpperCase(), pad, y);
+      y += 40;
+    }
+
+    if (stat) {
+      ctx.fillStyle = accent;
+      ctx.font = '900 110px "Segoe UI", sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'center';
+      ctx.fillText(stat, w/2, h/2 - 70);
+      ctx.textAlign = 'left';
+      if (statLabel) {
+        ctx.fillStyle = '#a0a0b8';
+        ctx.font = '600 22px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(statLabel.toUpperCase(), w/2, h/2 + 50);
+        ctx.textAlign = 'left';
+      }
+      return;
+    }
+
+    if (title) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '800 38px "Segoe UI", sans-serif';
+      ctx.textBaseline = 'top';
+      const ty = wrapText(ctx, title, pad, y, w - pad * 2, 46);
+      y = ty + 6;
+    }
+
+    if (body) {
+      ctx.fillStyle = '#aeaec8';
+      ctx.font = '400 24px "Segoe UI", sans-serif';
+      ctx.textBaseline = 'top';
+      wrapText(ctx, body, pad, y, w - pad * 2, 32);
+    }
+  });
+}
+
+function shade(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) + pct, g = ((n >> 8) & 255) + pct, b = (n & 255) + pct;
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+}
+
+/* =========================================================================
+   ROOM GEOMETRY
+   ========================================================================= */
+const LENGTH = N_ROOMS * STEP + 20;
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(ROOM_W, LENGTH),
+  new THREE.MeshStandardMaterial({ color: 0x0c0c15, roughness: 0.55, metalness: 0.35 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.position.z = -LENGTH / 2 + STEP;
+scene.add(floor);
+
+const ceil = new THREE.Mesh(
+  new THREE.PlaneGeometry(ROOM_W, LENGTH),
+  new THREE.MeshStandardMaterial({ color: 0x06060c, roughness: 1 })
+);
+ceil.rotation.x = Math.PI / 2;
+ceil.position.y = ROOM_H;
+ceil.position.z = -LENGTH / 2 + STEP;
+scene.add(ceil);
+
+const wallMat = new THREE.MeshStandardMaterial({ color: 0x0a0a14, roughness: 0.85, metalness: 0.15 });
+const sideWallGeo = new THREE.PlaneGeometry(LENGTH, ROOM_H);
+const leftWall = new THREE.Mesh(sideWallGeo, wallMat);
+leftWall.rotation.y = Math.PI / 2;
+leftWall.position.set(-ROOM_W / 2, ROOM_H / 2, -LENGTH / 2 + STEP);
+scene.add(leftWall);
+const rightWall = new THREE.Mesh(sideWallGeo, wallMat);
+rightWall.rotation.y = -Math.PI / 2;
+rightWall.position.set(ROOM_W / 2, ROOM_H / 2, -LENGTH / 2 + STEP);
+scene.add(rightWall);
+
+const capGeo = new THREE.PlaneGeometry(ROOM_W, ROOM_H);
+const backCap = new THREE.Mesh(capGeo, wallMat);
+backCap.position.set(0, ROOM_H/2, STEP);
+scene.add(backCap);
+const frontCap = new THREE.Mesh(capGeo, wallMat);
+frontCap.rotation.y = Math.PI;
+frontCap.position.set(0, ROOM_H/2, roomZ(N_ROOMS - 1) - ROOM_D/2 - GAP);
+scene.add(frontCap);
+
+const pillarMat = new THREE.MeshStandardMaterial({ color: 0x121222, roughness: 0.45, metalness: 0.5 });
+const ARCH_W = 5.5;
+const partitions = []; // for collision
+for (let i = 0; i < N_ROOMS - 1; i++) {
+  const zDiv = roomZ(i) - ROOM_D/2 - GAP/2;
+  const pw = (ROOM_W - ARCH_W) / 2;
+  const leftP = new THREE.Mesh(new THREE.BoxGeometry(pw, ROOM_H, 0.8), pillarMat);
+  leftP.position.set(-(ROOM_W/2 - pw/2), ROOM_H/2, zDiv);
+  scene.add(leftP);
+  const rightP = new THREE.Mesh(new THREE.BoxGeometry(pw, ROOM_H, 0.8), pillarMat);
+  rightP.position.set(ROOM_W/2 - pw/2, ROOM_H/2, zDiv);
+  scene.add(rightP);
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(ARCH_W + 0.2, ROOM_H - 5, 0.8), pillarMat);
+  lintel.position.set(0, ROOM_H - (ROOM_H - 5)/2, zDiv);
+  scene.add(lintel);
+  partitions.push(zDiv);
+}
+
+// Floor accent per room
+for (let i = 0; i < N_ROOMS; i++) {
+  const theme = C[ROOM_THEMES[i]].hex;
+  const strip = new THREE.Mesh(
+    new THREE.PlaneGeometry(ROOM_W * 0.8, 0.15),
+    new THREE.MeshBasicMaterial({ color: theme, transparent: true, opacity: 0.7 })
+  );
+  strip.rotation.x = -Math.PI / 2;
+  strip.position.set(0, 0.02, roomZ(i) - ROOM_D/2 + 1);
+  scene.add(strip);
+  const glow = new THREE.Mesh(
+    new THREE.PlaneGeometry(ROOM_W * 0.9, 4),
+    new THREE.MeshBasicMaterial({ color: theme, transparent: true, opacity: 0.08 })
+  );
+  glow.rotation.x = -Math.PI / 2;
+  glow.position.set(0, 0.01, roomZ(i) - ROOM_D/2 + 3);
+  scene.add(glow);
+}
+
+/* =========================================================================
+   ENVIRONMENT DECORATIONS
+   ========================================================================= */
+const flames = [];       // flame mesh + base scale + phase
+const flameLights = [];  // point light + base intensity + phase
+
+function makeCandle(color = 0xffaa44, height = 0.4) {
+  const g = new THREE.Group();
+  const wax = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.07, 0.09, height, 10),
+    new THREE.MeshStandardMaterial({ color: 0xe8dac8, roughness: 0.95 })
+  );
+  wax.position.y = height / 2;
+  g.add(wax);
+  const wick = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.005, 0.005, 0.04, 6),
+    new THREE.MeshStandardMaterial({ color: 0x1a1a1a })
+  );
+  wick.position.y = height + 0.02;
+  g.add(wick);
+  const flame = new THREE.Mesh(
+    new THREE.ConeGeometry(0.045, 0.14, 8),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.92, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  flame.position.y = height + 0.11;
+  g.add(flame);
+  flames.push({ mesh: flame, baseY: flame.position.y, baseScale: 1, phase: Math.random() * Math.PI * 2 });
+  const fl = new THREE.PointLight(color, 0.7, 3, 2);
+  fl.position.y = height + 0.11;
+  g.add(fl);
+  flameLights.push({ light: fl, base: 0.7, phase: Math.random() * Math.PI * 2 });
+  return g;
+}
+
+function makeCandelabra(color = 0xffaa44) {
+  const g = new THREE.Group();
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x3a3025, roughness: 0.4, metalness: 0.85 });
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 1.2, 10), baseMat);
+  stem.position.y = 0.6;
+  g.add(stem);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 0.08, 14), baseMat);
+  base.position.y = 0.04;
+  g.add(base);
+  const arm = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.03, 6, 14, Math.PI), baseMat);
+  arm.position.y = 1.1;
+  arm.rotation.x = Math.PI / 2;
+  g.add(arm);
+  for (let i = -1; i <= 1; i++) {
+    const candle = makeCandle(color, 0.22);
+    candle.position.set(i * 0.2, 1.1, 0);
+    g.add(candle);
+  }
+  return g;
+}
+
+function makeChest(theme = 0xf5c842) {
+  const g = new THREE.Group();
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x3a2416, roughness: 0.85, metalness: 0.1 });
+  const woodLight = new THREE.MeshStandardMaterial({ color: 0x4a3020, roughness: 0.8, metalness: 0.1 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.5, 0.55), woodMat);
+  body.position.y = 0.25;
+  g.add(body);
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(0.87, 0.18, 0.57), woodLight);
+  lid.position.y = 0.58;
+  lid.rotation.x = -0.15;
+  lid.position.z = -0.02;
+  g.add(lid);
+  const bandMat = new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: 0.4, metalness: 0.95 });
+  for (const bx of [-0.35, 0.35]) {
+    const band = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.55, 0.6), bandMat);
+    band.position.set(bx, 0.3, 0);
+    g.add(band);
+  }
+  const lock = new THREE.Mesh(
+    new THREE.BoxGeometry(0.09, 0.13, 0.04),
+    new THREE.MeshStandardMaterial({ color: theme, emissive: theme, emissiveIntensity: 0.5, metalness: 0.9, roughness: 0.25 })
+  );
+  lock.position.set(0, 0.48, 0.29);
+  g.add(lock);
+  return g;
+}
+
+function makeBag() {
+  const g = new THREE.Group();
+  const sack = new THREE.Mesh(
+    new THREE.SphereGeometry(0.24, 12, 10),
+    new THREE.MeshStandardMaterial({ color: 0x6e5438, roughness: 0.95 })
+  );
+  sack.scale.y = 1.1;
+  sack.position.y = 0.22;
+  g.add(sack);
+  const tie = new THREE.Mesh(
+    new THREE.TorusGeometry(0.08, 0.02, 6, 12),
+    new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: 0.9 })
+  );
+  tie.position.y = 0.44;
+  tie.rotation.x = Math.PI / 2;
+  g.add(tie);
+  const top = new THREE.Mesh(
+    new THREE.ConeGeometry(0.08, 0.16, 8),
+    new THREE.MeshStandardMaterial({ color: 0x6e5438, roughness: 0.95 })
+  );
+  top.position.y = 0.5;
+  g.add(top);
+  g.rotation.y = Math.random() * Math.PI * 2;
+  return g;
+}
+
+function makeBarrel() {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.3, 0.28, 0.75, 16),
+    new THREE.MeshStandardMaterial({ color: 0x523322, roughness: 0.85 })
+  );
+  body.position.y = 0.38;
+  g.add(body);
+  const bandMat = new THREE.MeshStandardMaterial({ color: 0x2a1a10, roughness: 0.35, metalness: 0.9 });
+  for (const by of [0.12, 0.62]) {
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.05, 16), bandMat);
+    band.position.y = by;
+    g.add(band);
+  }
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.02, 16), new THREE.MeshStandardMaterial({ color: 0x3a2416, roughness: 0.9 }));
+  top.position.y = 0.76;
+  g.add(top);
+  return g;
+}
+
+function makeTorch(color = 0xff8844) {
+  const g = new THREE.Group();
+  const bracket = new THREE.Mesh(
+    new THREE.BoxGeometry(0.08, 0.3, 0.1),
+    new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.5, metalness: 0.85 })
+  );
+  g.add(bracket);
+  const stick = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.025, 0.02, 0.5, 8),
+    new THREE.MeshStandardMaterial({ color: 0x3a2416, roughness: 0.9 })
+  );
+  stick.rotation.x = -0.3;
+  stick.position.set(0, 0.1, 0.2);
+  g.add(stick);
+  const flame = new THREE.Mesh(
+    new THREE.SphereGeometry(0.09, 10, 8),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.92, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  flame.scale.y = 1.5;
+  flame.position.set(0, 0.32, 0.35);
+  g.add(flame);
+  flames.push({ mesh: flame, baseY: flame.position.y, baseScale: 1, phase: Math.random() * Math.PI * 2 });
+  const fl = new THREE.PointLight(color, 1.1, 5, 2);
+  fl.position.copy(flame.position);
+  g.add(fl);
+  flameLights.push({ light: fl, base: 1.1, phase: Math.random() * Math.PI * 2 });
+  return g;
+}
+
+function makeBookStack() {
+  const g = new THREE.Group();
+  const colors = [0x6b2b2b, 0x2b4a6b, 0x2b6b4a, 0x6b5b2b, 0x4a2b6b];
+  let y = 0;
+  for (let i = 0; i < 3 + Math.floor(Math.random() * 2); i++) {
+    const w = 0.22 + Math.random() * 0.08;
+    const d = 0.14 + Math.random() * 0.06;
+    const h = 0.04 + Math.random() * 0.02;
+    const book = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random() * colors.length)], roughness: 0.85 })
+    );
+    book.position.y = y + h / 2;
+    book.rotation.y = (Math.random() - 0.5) * 0.3;
+    g.add(book);
+    y += h;
+  }
+  return g;
+}
+
+// Place decorations in each room
+for (let i = 0; i < N_ROOMS; i++) {
+  const z = roomZ(i);
+  const theme = C[ROOM_THEMES[i]].hex;
+  const halfW = ROOM_W / 2;
+  const halfD = ROOM_D / 2;
+
+  // Candelabras flanking archway entrance (toward player from previous room)
+  if (i > 0) {
+    const cz = z + halfD - 0.7;
+    const cL = makeCandelabra(theme);
+    cL.position.set(-ARCH_W/2 - 0.6, 0, cz);
+    scene.add(cL);
+    const cR = makeCandelabra(theme);
+    cR.position.set(ARCH_W/2 + 0.6, 0, cz);
+    scene.add(cR);
+  }
+
+  // Wall torches on side walls mid-room
+  const torchL = makeTorch(theme);
+  torchL.position.set(-halfW + 0.1, 3.2, z);
+  torchL.rotation.y = Math.PI / 2;
+  scene.add(torchL);
+  const torchR = makeTorch(theme);
+  torchR.position.set(halfW - 0.1, 3.2, z);
+  torchR.rotation.y = -Math.PI / 2;
+  scene.add(torchR);
+
+  // Corner clutter — rotate arrangement per room
+  const clutterSpots = [
+    { x: -halfW + 0.9, z: z - halfD + 1.2 },
+    { x:  halfW - 0.9, z: z - halfD + 1.2 },
+    { x: -halfW + 1.0, z: z + halfD - 2.0 },
+    { x:  halfW - 1.0, z: z + halfD - 2.0 },
+  ];
+  const kinds = ['chest', 'bag', 'barrel', 'books'];
+  // shuffle kinds per room
+  for (let k = kinds.length - 1; k > 0; k--) {
+    const j = (i * 7 + k) % (k + 1);
+    [kinds[k], kinds[j]] = [kinds[j], kinds[k]];
+  }
+  for (let s = 0; s < clutterSpots.length; s++) {
+    const spot = clutterSpots[s];
+    let obj;
+    switch (kinds[s]) {
+      case 'chest':  obj = makeChest(theme); break;
+      case 'bag':    obj = makeBag(); break;
+      case 'barrel': obj = makeBarrel(); break;
+      case 'books':  obj = makeBookStack(); break;
+    }
+    if (!obj) continue;
+    obj.position.set(spot.x, 0, spot.z);
+    obj.rotation.y = Math.random() * Math.PI * 2;
+    scene.add(obj);
+  }
+
+  // Small candle near one clutter spot
+  const candle = makeCandle(theme, 0.28);
+  candle.position.set(-halfW + 1.8, 0, z - halfD + 1.2);
+  scene.add(candle);
+}
+
+/* =========================================================================
+   LIGHTS
+   ========================================================================= */
+scene.add(new THREE.AmbientLight(0x222233, 0.35));
+scene.add(new THREE.HemisphereLight(0x3040ff, 0x060608, 0.15));
+
+const roomLights = [];
+for (let i = 0; i < N_ROOMS; i++) {
+  const theme = C[ROOM_THEMES[i]].hex;
+  const pl = new THREE.PointLight(theme, 1.5, 26, 1.6);
+  pl.position.set(0, ROOM_H - 1.2, roomZ(i));
+  scene.add(pl);
+  const pl2 = new THREE.PointLight(theme, 0.7, 14, 2);
+  pl2.position.set(-ROOM_W/2 + 1.2, 2.2, roomZ(i) + 4);
+  scene.add(pl2);
+  const pl3 = new THREE.PointLight(theme, 0.7, 14, 2);
+  pl3.position.set(ROOM_W/2 - 1.2, 2.2, roomZ(i) - 4);
+  scene.add(pl3);
+  roomLights.push({ pl, pl2, pl3, base: 1.5 });
+  // ceiling fixture
+  const fix = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 12, 8),
+    new THREE.MeshBasicMaterial({ color: theme })
+  );
+  fix.position.set(0, ROOM_H - 0.6, roomZ(i));
+  scene.add(fix);
+}
+
+// Flashlight on camera
+const flashlight = new THREE.SpotLight(0xfff4d6, 0.9, 18, Math.PI / 4.5, 0.6, 1.3);
+flashlight.position.set(0, 0, 0);
+camera.add(flashlight);
+const flashTarget = new THREE.Object3D();
+flashTarget.position.set(0, 0, -10);
+camera.add(flashTarget);
+flashlight.target = flashTarget;
+/* =========================================================================
+   HANDS (attached to camera)
+   ========================================================================= */
+const handGroup = new THREE.Group();
+camera.add(handGroup);
+
+function makeHand(side) {
+  const g = new THREE.Group();
+  const skinMat = new THREE.MeshStandardMaterial({ color: 0xd9a373, roughness: 0.8, metalness: 0.05 });
+  const sleeveMat = new THREE.MeshStandardMaterial({ color: 0x2a2a3d, roughness: 0.9 });
+  const forearm = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.35), sleeveMat);
+  forearm.position.z = -0.18;
+  g.add(forearm);
+  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.04, 0.13), skinMat);
+  palm.position.z = -0.42;
+  palm.position.y = -0.01;
+  g.add(palm);
+  // fingers
+  for (let i = 0; i < 4; i++) {
+    const finger = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.025, 0.09), skinMat);
+    finger.position.set(-0.035 + i*0.023, -0.01, -0.52);
+    g.add(finger);
+  }
+  const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.07), skinMat);
+  thumb.position.set(side === 'left' ? 0.06 : -0.06, -0.005, -0.46);
+  thumb.rotation.z = side === 'left' ? -0.5 : 0.5;
+  g.add(thumb);
+  return g;
+}
+const leftHand = makeHand('left');
+leftHand.position.set(-0.25, -0.28, -0.1);
+handGroup.add(leftHand);
+const rightHand = makeHand('right');
+rightHand.position.set(0.25, -0.28, -0.1);
+handGroup.add(rightHand);
+
+// Wizard staff gripped by right hand
+const staff = new THREE.Group();
+const shaftMat = new THREE.MeshStandardMaterial({ color: 0x5a3a20, roughness: 0.85, metalness: 0.1, emissive: 0x221100, emissiveIntensity: 0.3 });
+const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.028, 1.7, 12), shaftMat);
+shaft.position.y = 0.75;
+staff.add(shaft);
+// wrap rings
+for (let i = 0; i < 3; i++) {
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.03, 0.008, 6, 16),
+    new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.5, metalness: 0.7 })
+  );
+  ring.position.y = 0.1 + i * 0.06;
+  ring.rotation.x = Math.PI / 2;
+  staff.add(ring);
+}
+// Crystal gem at top
+const gemMat = new THREE.MeshStandardMaterial({
+  color: 0xaaccff, emissive: 0x6699ff, emissiveIntensity: 3,
+  roughness: 0.15, metalness: 0.9, transparent: true, opacity: 0.95,
+});
+const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.12, 0), gemMat);
+gem.position.y = 1.72;
+gem.scale.y = 1.4;
+staff.add(gem);
+// Glow sprite around gem
+const gemGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(0.22, 12, 12),
+  new THREE.MeshBasicMaterial({ color: 0x6699ff, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false })
+);
+gemGlow.position.y = 1.72;
+staff.add(gemGlow);
+// Light at gem
+const gemLight = new THREE.PointLight(0x6699ff, 0.8, 4, 2);
+gemLight.position.y = 1.72;
+staff.add(gemLight);
+// Invisible tip anchor for lightning origin
+const staffTip = new THREE.Object3D();
+staffTip.position.y = 1.82;
+staff.add(staffTip);
+
+staff.scale.setScalar(0.45);
+staff.rotation.x = -1.15;
+staff.rotation.z = 0.2;
+staff.position.set(0.0, -0.08, -0.32);
+rightHand.add(staff);
+
+/* =========================================================================
+   LIGHTNING
+   ========================================================================= */
+const lightnings = [];
+const LIGHTNING_COLOR = 0xbbddff;
+
+function spawnLightning(from, to) {
+  const segs = 22;
+  const pts = [];
+  for (let i = 0; i <= segs; i++) {
+    const p = new THREE.Vector3().lerpVectors(from, to, i / segs);
+    pts.push(p);
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({ color: LIGHTNING_COLOR, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthTest: false });
+  const bolt = new THREE.Line(geo, mat);
+  bolt.renderOrder = 999;
+  bolt.userData = { life: 0.45, maxLife: 0.45, from: from.clone(), to: to.clone(), segs, isBolt: true };
+  scene.add(bolt);
+  lightnings.push(bolt);
+
+  // Side forks
+  for (let f = 0; f < 2; f++) {
+    const forkStart = new THREE.Vector3().lerpVectors(from, to, 0.3 + Math.random() * 0.4);
+    const forkEnd = forkStart.clone().add(new THREE.Vector3(
+      (Math.random() - 0.5) * 2.5,
+      (Math.random() - 0.5) * 2.5,
+      (Math.random() - 0.5) * 2.5,
+    ));
+    const forkSegs = 8;
+    const fpts = [];
+    for (let i = 0; i <= forkSegs; i++) fpts.push(new THREE.Vector3().lerpVectors(forkStart, forkEnd, i / forkSegs));
+    const fgeo = new THREE.BufferGeometry().setFromPoints(fpts);
+    const fmat = new THREE.LineBasicMaterial({ color: LIGHTNING_COLOR, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthTest: false });
+    const fork = new THREE.Line(fgeo, fmat);
+    fork.renderOrder = 999;
+    fork.userData = { life: 0.3, maxLife: 0.3, from: forkStart, to: forkEnd, segs: forkSegs, isBolt: true };
+    scene.add(fork);
+    lightnings.push(fork);
+  }
+
+  // Impact flash light
+  const flash = new THREE.PointLight(0x99bbff, 6, 10, 2);
+  flash.position.copy(to);
+  flash.userData = { life: 0.35, maxLife: 0.35, isFlash: true, baseIntensity: 6 };
+  scene.add(flash);
+  lightnings.push(flash);
+
+  // Origin flash light (staff tip)
+  const flash2 = new THREE.PointLight(0xccddff, 3, 5, 2);
+  flash2.position.copy(from);
+  flash2.userData = { life: 0.25, maxLife: 0.25, isFlash: true, baseIntensity: 3 };
+  scene.add(flash2);
+  lightnings.push(flash2);
+}
+
+function updateLightning(dt) {
+  for (let i = lightnings.length - 1; i >= 0; i--) {
+    const l = lightnings[i];
+    l.userData.life -= dt;
+    if (l.userData.life <= 0) {
+      scene.remove(l);
+      if (l.geometry) l.geometry.dispose();
+      if (l.material) l.material.dispose();
+      lightnings.splice(i, 1);
+      continue;
+    }
+    const k = l.userData.life / l.userData.maxLife;
+    if (l.userData.isBolt) {
+      const positions = l.geometry.attributes.position.array;
+      const segs = l.userData.segs;
+      const jitter = 0.35;
+      for (let j = 1; j < segs; j++) {
+        const tt = j / segs;
+        const p = l.userData.from.clone().lerp(l.userData.to, tt);
+        p.x += (Math.random() - 0.5) * jitter;
+        p.y += (Math.random() - 0.5) * jitter;
+        p.z += (Math.random() - 0.5) * jitter;
+        positions[j*3] = p.x; positions[j*3+1] = p.y; positions[j*3+2] = p.z;
+      }
+      l.geometry.attributes.position.needsUpdate = true;
+      l.material.opacity = Math.min(1, k * 1.5);
+    } else if (l.userData.isFlash) {
+      l.intensity = l.userData.baseIntensity * k;
+    }
+  }
+}
+
+/* =========================================================================
+   PARTICLES + LIGHT SHAFTS
+   ========================================================================= */
+const partCount = 500;
+const partGeo = new THREE.BufferGeometry();
+const partPos = new Float32Array(partCount * 3);
+const partCol = new Float32Array(partCount * 3);
+const palette = [C.gold.hex, C.purple.hex, C.blue.hex, C.orange.hex, C.green.hex];
+for (let i = 0; i < partCount; i++) {
+  partPos[i*3]   = (Math.random() - 0.5) * ROOM_W * 0.9;
+  partPos[i*3+1] = Math.random() * ROOM_H;
+  partPos[i*3+2] = -Math.random() * LENGTH;
+  const col = new THREE.Color(palette[Math.floor(Math.random() * palette.length)]);
+  partCol[i*3] = col.r; partCol[i*3+1] = col.g; partCol[i*3+2] = col.b;
+}
+partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+partGeo.setAttribute('color', new THREE.BufferAttribute(partCol, 3));
+const particles = new THREE.Points(partGeo, new THREE.PointsMaterial({
+  size: 0.1, vertexColors: true, transparent: true, opacity: 0.75,
+  depthWrite: false, blending: THREE.AdditiveBlending
+}));
+scene.add(particles);
+
+const shafts = [];
+for (let i = 0; i < N_ROOMS; i++) {
+  const theme = C[ROOM_THEMES[i]].hex;
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(2.2, 7.5, 24, 1, true),
+    new THREE.MeshBasicMaterial({ color: theme, transparent: true, opacity: 0.09, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })
+  );
+  cone.position.set(0, ROOM_H - 3.8, roomZ(i));
+  scene.add(cone);
+  shafts.push(cone);
+}
+
+/* =========================================================================
+   REVEAL SYSTEM
+   ========================================================================= */
+const rooms = Array.from({ length: N_ROOMS }, () => []);
+
+function addElement(roomIdx, mesh, finalPos) {
+  mesh.userData.finalPos = finalPos.clone();
+  mesh.userData.revealed = false;
+  mesh.userData.animT = 0;
+  mesh.userData.baseScale = mesh.scale.clone();
+  mesh.userData.roomIdx = roomIdx;
+  mesh.position.copy(finalPos);
+  mesh.scale.setScalar(0.001);
+  mesh.traverse(o => {
+    if (o.isMesh && o.material) {
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats) {
+        m.transparent = true;
+        m.opacity = 0;
+        m.userData.baseOpacity = m.userData.baseOpacity ?? 1;
+      }
+    }
+  });
+  scene.add(mesh);
+  rooms[roomIdx].push(mesh);
+  return mesh;
+}
+
+/* =========================================================================
+   ELEMENT BUILDERS
+   ========================================================================= */
+function imagePlane(texture, w, h) {
+  const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+}
+
+function framedImage(texture, w, h, frameColor = 0xffffff) {
+  const group = new THREE.Group();
+  const pad = 0.12;
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(w + pad*2, h + pad*2),
+    new THREE.MeshBasicMaterial({ color: frameColor, transparent: true, opacity: 0.45 })
+  );
+  frame.position.z = -0.01;
+  group.add(frame);
+  group.add(imagePlane(texture, w, h));
+  return group;
+}
+
+function textPanel(opts) {
+  const tex = textTexture(opts);
+  const w = opts.planeW || 10;
+  const h = (w * tex.image.height) / tex.image.width;
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+}
+
+function cardPanel(opts) {
+  const tex = cardTexture(opts);
+  const w = opts.planeW || 6;
+  const h = (w * tex.image.height) / tex.image.width;
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+}
+
+/* =========================================================================
+   BUILD ROOMS
+   ========================================================================= */
+
+// Room 0: TITLE
+{
+  const z = roomZ(0);
+  const title = textPanel({
+    width: 1400, height: 520,
+    label: 'Entropedia · Week 3', title: 'Show & Tell',
+    titleSize: 200, subtitle: 'April 13–16, 2026', subtitleSize: 42,
+    align: 'center', accent: C.gold.css, planeW: 13,
+  });
+  addElement(0, title, new THREE.Vector3(0, 4.2, z - 3));
+
+  const poster = framedImage(tex_poster, 4.4, 6.4, C.gold.hex);
+  addElement(0, poster, new THREE.Vector3(-6.5, 3.4, z - 6));
+
+  const tag = textPanel({
+    width: 1000, height: 180,
+    subtitle: 'Walk through the chambers. Click the glowing orbs to reveal.',
+    subtitleSize: 30, align: 'center', planeW: 9,
+  });
+  addElement(0, tag, new THREE.Vector3(0, 1.6, z - 3));
+}
+
+// Room 1: TWO HYPOTHESES
+{
+  const z = roomZ(1);
+  const head = textPanel({
+    width: 1200, height: 380, label: 'This Week', title: 'Two Hypotheses',
+    titleSize: 130, align: 'center', accent: C.gold.css, planeW: 12,
+  });
+  addElement(1, head, new THREE.Vector3(0, 5.5, z + 6));
+
+  const cardA = cardPanel({
+    width: 1000, height: 500, bg: '#13131f', accent: C.purple.css,
+    label: 'A', title: 'New semantic game modes are fun',
+    body: 'Rework the rules, add variety, make it sticky', planeW: 8.5,
+  });
+  addElement(1, cardA, new THREE.Vector3(-4.8, 3.2, z));
+
+  const cardB = cardPanel({
+    width: 1000, height: 500, bg: '#13131f', accent: C.orange.css,
+    label: 'B', title: 'Gain traction through Reddit',
+    body: 'Post on relevant subreddits, drive traffic', planeW: 8.5,
+  });
+  addElement(1, cardB, new THREE.Vector3(4.8, 3.2, z));
+}
+
+// Room 2: HYPOTHESIS A HEADER
+{
+  const z = roomZ(2);
+  const head = textPanel({
+    width: 1200, height: 520, label: 'Hypothesis A', title: 'New semantic\nmodes are fun',
+    titleSize: 120, align: 'left', accent: C.purple.css, planeW: 10,
+  });
+  addElement(2, head, new THREE.Vector3(-4.5, 4, z + 4));
+
+  const sub = textPanel({
+    width: 1000, height: 260,
+    subtitle: 'We reworked the semantic battle rules and LLM-based lane scoring. The goal: make the game sticky enough that players come back.',
+    subtitleSize: 32, align: 'left', planeW: 9,
+  });
+  addElement(2, sub, new THREE.Vector3(-4.5, 1.4, z + 4));
+
+  const poster = framedImage(tex_poster, 5, 7.2, C.purple.hex);
+  addElement(2, poster, new THREE.Vector3(4.5, 3.6, z - 2));
+}
+
+// Room 3: HIVE PLAYTESTS
+{
+  const z = roomZ(3);
+  const head = textPanel({
+    width: 1200, height: 300, label: 'Hypothesis A · Playtest', title: 'Hive Playtests',
+    titleSize: 110, align: 'left', accent: C.purple.css, planeW: 11,
+  });
+  addElement(3, head, new THREE.Vector3(-4.5, 6, z + 6));
+
+  const photo = framedImage(tex_playtest, 7.2, 5, C.green.hex);
+  addElement(3, photo, new THREE.Vector3(5, 3.5, z));
+
+  const c1 = cardPanel({
+    width: 900, height: 320, bg: '#13131f', accent: C.purple.css,
+    title: '10+ people around 2 players',
+    body: 'Updated semantic rules made the game sticky. People stopped to watch and wanted to play next.',
+    planeW: 6.5,
+  });
+  addElement(3, c1, new THREE.Vector3(-5.5, 5, z));
+
+  const c2 = cardPanel({
+    width: 900, height: 320, bg: '#13131f', accent: C.green.css,
+    title: 'Players came back on their own',
+    body: 'Some asked for the URL and returned during the week to keep playing.',
+    planeW: 6.5,
+  });
+  addElement(3, c2, new THREE.Vector3(-5.5, 2.7, z));
+
+  const c3 = cardPanel({
+    width: 900, height: 320, bg: '#13131f', accent: C.gold.css,
+    title: 'The social aspect worked',
+    body: 'Spectators cheering, trash-talking, wanting to jump in. The game is a social experience.',
+    planeW: 6.5,
+  });
+  addElement(3, c3, new THREE.Vector3(-5.5, 0.5, z));
+}
+
+// Room 4: SEMANTIC VIDEO
+{
+  const z = roomZ(4);
+  const head = textPanel({
+    width: 1200, height: 280, label: 'Hypothesis A · New Semantic Battle',
+    title: 'Reworked Semantic Mode', titleSize: 88, align: 'center',
+    accent: C.purple.css, planeW: 12,
+  });
+  addElement(4, head, new THREE.Vector3(0, 6.4, z + 2));
+
+  const videoMat = new THREE.MeshBasicMaterial({ map: vtex, transparent: true, side: THREE.DoubleSide });
+  const videoMesh = new THREE.Mesh(new THREE.PlaneGeometry(11, 6.19), videoMat);
+  const videoFrame = new THREE.Mesh(
+    new THREE.PlaneGeometry(11.3, 6.49),
+    new THREE.MeshBasicMaterial({ color: C.purple.hex, transparent: true, opacity: 0.45 })
+  );
+  videoFrame.position.z = -0.01;
+  const vGroup = new THREE.Group();
+  vGroup.add(videoFrame);
+  vGroup.add(videoMesh);
+  vGroup.userData.isVideo = true;
+  addElement(4, vGroup, new THREE.Vector3(0, 3.3, z - 2));
+}
+
+// Room 5: HYPOTHESIS B HEADER
+{
+  const z = roomZ(5);
+  const head = textPanel({
+    width: 1200, height: 500, label: 'Hypothesis B', title: 'Gain traction\nthrough Reddit',
+    titleSize: 120, align: 'left', accent: C.orange.css, planeW: 10,
+  });
+  addElement(5, head, new THREE.Vector3(-4.5, 4, z));
+
+  const sub = textPanel({
+    width: 1000, height: 220,
+    subtitle: 'Post on r/aigamedev and r/ChatGPT to drive traffic to the game.',
+    subtitleSize: 32, align: 'left', planeW: 9,
+  });
+  addElement(5, sub, new THREE.Vector3(-4.5, 1.3, z));
+
+  const blob = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.8, 1),
+    new THREE.MeshStandardMaterial({ color: C.orange.hex, emissive: C.orange.hex, emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.7 })
+  );
+  addElement(5, blob, new THREE.Vector3(5, 3.5, z - 2));
+  blob.userData.spin = true;
+}
+
+// Room 6: REDDIT POSTS
+{
+  const z = roomZ(6);
+  const head = textPanel({
+    width: 1400, height: 340, label: 'Hypothesis B · Reddit', title: 'Posts Got Some Traction',
+    titleSize: 88, subtitle: 'Combined 20K views across both subreddits',
+    subtitleSize: 30, align: 'left', accent: C.orange.css, planeW: 13,
+  });
+  addElement(6, head, new THREE.Vector3(-0.8, 6.4, z + 6));
+
+  const chat = framedImage(tex_reddit_chat, 5.5, 6, C.orange.hex);
+  addElement(6, chat, new THREE.Vector3(-3.8, 3.4, z));
+
+  const chatStat = cardPanel({
+    width: 600, height: 200, bg: '#13131f', accent: C.orange.css,
+    label: 'r/ChatGPT', title: '15 upvotes · 23 comments', planeW: 4.5,
+  });
+  addElement(6, chatStat, new THREE.Vector3(-3.8, 0.2, z));
+
+  const ai = framedImage(tex_reddit_ai, 5.5, 6, C.orange.hex);
+  addElement(6, ai, new THREE.Vector3(3.8, 3.4, z));
+
+  const aiStat = cardPanel({
+    width: 600, height: 200, bg: '#13131f', accent: C.orange.css,
+    label: 'r/aigamedev', title: '12 upvotes · 5 comments', planeW: 4.5,
+  });
+  addElement(6, aiStat, new THREE.Vector3(3.8, 0.2, z));
+}
+
+// Room 7: DAU SPIKE
+{
+  const z = roomZ(7);
+  const head = textPanel({
+    width: 1200, height: 280, label: 'Result · Analytics', title: 'DAU Spike After Reddit',
+    titleSize: 88, align: 'center', accent: C.green.css, planeW: 12,
+  });
+  addElement(7, head, new THREE.Vector3(0, 6.5, z + 6));
+
+  const graph = framedImage(tex_posthog, 10, 4.5, 0xffffff);
+  addElement(7, graph, new THREE.Vector3(0, 3.8, z + 1));
+
+  const s1 = cardPanel({
+    width: 600, height: 500, bg: '#13131f', accent: C.green.css,
+    stat: '~10', statLabel: 'Baseline DAU', planeW: 3,
+  });
+  addElement(7, s1, new THREE.Vector3(-3.8, 0.8, z - 2));
+
+  const s2 = cardPanel({
+    width: 600, height: 500, bg: '#13131f', accent: C.green.css,
+    stat: '88', statLabel: 'Peak DAU', planeW: 3,
+  });
+  addElement(7, s2, new THREE.Vector3(0, 0.8, z - 2));
+
+  const s3 = cardPanel({
+    width: 600, height: 500, bg: '#13131f', accent: C.green.css,
+    stat: '~8x', statLabel: 'Growth', planeW: 3,
+  });
+  addElement(7, s3, new THREE.Vector3(3.8, 0.8, z - 2));
+}
+
+// Room 8: OTHER GAME MODES
+{
+  const z = roomZ(8);
+  const head = textPanel({
+    width: 1300, height: 280, label: 'New Game Modes', title: 'More Ways to Play Semantically',
+    titleSize: 78, align: 'center', accent: C.blue.css, planeW: 13,
+  });
+  addElement(8, head, new THREE.Vector3(0, 6.5, z + 6));
+
+  const m1 = cardPanel({
+    width: 750, height: 700, bg: '#13131f', accent: C.purple.css,
+    pill: 'WIP', title: 'Sweaty Semantic',
+    body: 'Rarity escalation — start common, end legendary. Pressure ramps every round.',
+    planeW: 4,
+  });
+  addElement(8, m1, new THREE.Vector3(-4.5, 3.2, z - 1));
+
+  const m2 = cardPanel({
+    width: 750, height: 700, bg: '#13131f', accent: C.blue.css,
+    pill: 'WIP', title: 'Raid',
+    body: 'Chain builder + raid player. Cooperative PvE — build card chains together.',
+    planeW: 4,
+  });
+  addElement(8, m2, new THREE.Vector3(0, 3.2, z - 1));
+
+  const raidImg = imagePlane(tex_raid, 3.4, 1.6);
+  addElement(8, raidImg, new THREE.Vector3(0, 0.8, z - 0.9));
+
+  const m3 = cardPanel({
+    width: 750, height: 700, bg: '#13131f', accent: C.gold.css,
+    pill: 'WIP', title: 'Daily Challenge',
+    body: 'Craft a mythic card matching a daily target. Refreshes every 24h.',
+    planeW: 4,
+  });
+  addElement(8, m3, new THREE.Vector3(4.5, 3.2, z - 1));
+
+  const dailyImg = imagePlane(tex_daily, 3.4, 1.6);
+  addElement(8, dailyImg, new THREE.Vector3(4.5, 0.8, z - 0.9));
+}
+
+// Room 9: RETENTION
+{
+  const z = roomZ(9);
+  const head = textPanel({
+    width: 1300, height: 300, label: 'Retention', title: 'Game Modes Drive Retention',
+    titleSize: 82, align: 'center', accent: C.gold.css, planeW: 13,
+  });
+  addElement(9, head, new THREE.Vector3(0, 6.5, z + 6));
+
+  const callout = cardPanel({
+    width: 1400, height: 320, bg: '#13131f', accent: C.orange.css,
+    title: 'But we need more players to prove it',
+    body: 'Retention is meaningless without a player base. We need to keep driving traffic to validate the loop.',
+    planeW: 12,
+  });
+  addElement(9, callout, new THREE.Vector3(0, 4.2, z + 2));
+
+  const c1 = cardPanel({
+    width: 700, height: 500, bg: '#13131f', accent: C.orange.css,
+    label: 'Reddit Posts', title: 'Keep posting', body: 'Relevant subreddits.', planeW: 3.8,
+  });
+  addElement(9, c1, new THREE.Vector3(-4.5, 1.2, z - 2));
+
+  const c2 = cardPanel({
+    width: 700, height: 500, bg: '#13131f', accent: C.blue.css,
+    label: 'Ads?', title: 'Paid acquisition', body: 'Explore channels.', planeW: 3.8,
+  });
+  addElement(9, c2, new THREE.Vector3(0, 1.2, z - 2));
+
+  const c3 = cardPanel({
+    width: 700, height: 500, bg: '#13131f', accent: C.purple.css,
+    label: 'Discord', title: 'Community hub', body: 'Build a home for players.', planeW: 3.8,
+  });
+  addElement(9, c3, new THREE.Vector3(4.5, 1.2, z - 2));
+}
+
+/* =========================================================================
+   PLAYER + MOVEMENT
+   ========================================================================= */
+camera.position.set(0, EYE_H, roomZ(0) + 9);
+
+const keys = { w:false, a:false, s:false, d:false, shift:false };
+let jumpVel = 0;
+let isGrounded = true;
+const GRAVITY = 22;
+const JUMP_VEL = 7;
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = true;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = true;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
+  if (e.code === 'ShiftLeft') keys.shift = true;
+  if (e.code === 'Space' && isGrounded && controls.isLocked) {
+    jumpVel = JUMP_VEL;
+    isGrounded = false;
+    playJump();
+    e.preventDefault();
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = false;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = false;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
+  if (e.code === 'ShiftLeft') keys.shift = false;
+});
+
+/* =========================================================================
+   INTERACTION (LMB)
+   ========================================================================= */
+let currentRoom = 0;
+const counterEl = document.getElementById('counter');
+const progressFill = document.getElementById('progress-fill');
+const roomNameEl = document.getElementById('room-name');
+const roomTitleEl = document.getElementById('room-title');
+const crosshair = document.getElementById('crosshair');
+const roomsRevealed = Array(N_ROOMS).fill(0);
+let handAnimT = 0;
+let started = false;
+
+function updateHUD() {
+  counterEl.innerHTML = `<strong>${currentRoom + 1}</strong> / ${N_ROOMS}`;
+  let totalSteps = rooms.reduce((s, r) => s + r.length, 0);
+  let done = 0;
+  for (let i = 0; i <= currentRoom; i++) done += (i < currentRoom) ? rooms[i].length : roomsRevealed[i];
+  progressFill.style.width = Math.min(100, (done / totalSteps) * 100) + '%';
+  roomNameEl.textContent = ROOM_NAMES[currentRoom];
+  roomTitleEl.classList.add('show');
+}
+
+function revealNextInRoom(idx) {
+  const r = rooms[idx];
+  if (roomsRevealed[idx] < r.length) {
+    const m = r[roomsRevealed[idx]];
+    m.userData.revealed = true;
+    m.userData.animT = 0;
+    roomsRevealed[idx]++;
+    playReveal();
+    triggerHandSwing();
+    updateHUD();
+    return m;
+  }
+  return null;
+}
+
+function triggerHandSwing() {
+  handAnimT = 1;
+}
+
+const _tipWorld = new THREE.Vector3();
+renderer.domElement.addEventListener('mousedown', e => {
+  if (!controls.isLocked || e.button !== 0) return;
+  const revealed = revealNextInRoom(currentRoom);
+  if (revealed) {
+    staffTip.getWorldPosition(_tipWorld);
+    spawnLightning(_tipWorld.clone(), revealed.userData.finalPos.clone());
+    playZap();
+  } else {
+    playDeny();
+    triggerHandSwing();
+  }
+});
+
+/* =========================================================================
+   START
+   ========================================================================= */
+startBtn.addEventListener('click', () => {
+  initAudio();
+  loaderEl.classList.add('gone');
+  setTimeout(() => loaderEl.style.display = 'none', 1000);
+  controls.lock();
+  videoEl.play().catch(() => {});
+  videoEl.pause();
+  started = true;
+  updateHUD();
+});
+
+/* =========================================================================
+   ANIMATION LOOP
+   ========================================================================= */
+const clock = new THREE.Clock();
+let walkBob = 0;
+let lastFootstep = 0;
+const tmpForward = new THREE.Vector3();
+const tmpRight = new THREE.Vector3();
+
+function animate() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  // --- Movement ---
+  if (controls.isLocked) {
+    const speed = keys.shift ? 14 : 4;
+    tmpForward.set(0, 0, -1).applyQuaternion(camera.quaternion); tmpForward.y = 0; tmpForward.normalize();
+    tmpRight.set(1, 0, 0).applyQuaternion(camera.quaternion); tmpRight.y = 0; tmpRight.normalize();
+    const move = new THREE.Vector3();
+    if (keys.w) move.add(tmpForward);
+    if (keys.s) move.sub(tmpForward);
+    if (keys.d) move.add(tmpRight);
+    if (keys.a) move.sub(tmpRight);
+    if (move.lengthSq() > 0) move.normalize().multiplyScalar(speed * dt);
+
+    const oldZ = camera.position.z;
+    camera.position.x += move.x;
+    camera.position.z += move.z;
+
+    const pad = 0.6;
+    camera.position.x = Math.max(-ROOM_W/2 + pad, Math.min(ROOM_W/2 - pad, camera.position.x));
+    camera.position.z = Math.max(roomZ(N_ROOMS - 1) - ROOM_D/2 - GAP + pad, Math.min(STEP - pad, camera.position.z));
+
+    for (const zDiv of partitions) {
+      const crossed = (oldZ > zDiv) !== (camera.position.z > zDiv);
+      if (crossed && Math.abs(camera.position.x) > ARCH_W/2 - 0.3) {
+        camera.position.z = oldZ;
+      }
+    }
+
+    let room = 0;
+    for (let i = 0; i < N_ROOMS; i++) {
+      if (camera.position.z < roomZ(i) + ROOM_D/2 && camera.position.z > roomZ(i) - ROOM_D/2 - GAP) {
+        room = i; break;
+      }
+    }
+    if (room !== currentRoom) {
+      currentRoom = room;
+      updateHUD();
+      if (currentRoom === 4) videoEl.play().catch(() => {});
+      else videoEl.pause();
+    }
+
+    // Jump physics
+    if (!isGrounded) {
+      jumpVel -= GRAVITY * dt;
+      camera.position.y += jumpVel * dt;
+      if (camera.position.y <= EYE_H) {
+        camera.position.y = EYE_H;
+        jumpVel = 0;
+        isGrounded = true;
+        playFootstep();
+      }
+    } else if (move.lengthSq() > 0) {
+      walkBob += dt * (keys.shift ? 18 : 8);
+      camera.position.y = EYE_H + Math.sin(walkBob) * 0.04;
+      if (t - lastFootstep > (keys.shift ? 0.22 : 0.45)) {
+        playFootstep();
+        lastFootstep = t;
+      }
+    } else {
+      camera.position.y += (EYE_H + Math.sin(t * 1.5) * 0.01 - camera.position.y) * 0.15;
+    }
+  }
+
+  updateLightning(dt);
+
+  // Crosshair activates when current room has unrevealed elements
+  const hasMore = roomsRevealed[currentRoom] < rooms[currentRoom].length;
+  crosshair.classList.toggle('active', hasMore);
+
+  // Hand base + swing
+  handAnimT = Math.max(0, handAnimT - dt * 3);
+  const swing = Math.sin(handAnimT * Math.PI) * 0.3;
+  rightHand.position.set(0.25, -0.28 + swing * 0.1, -0.1 - swing * 0.15);
+  rightHand.rotation.x = -swing * 1.2;
+  leftHand.position.set(-0.25, -0.28 - swing * 0.05, -0.1);
+  // subtle idle bob
+  const idleBob = Math.sin(t * 2) * 0.01;
+  rightHand.position.y += idleBob;
+  leftHand.position.y += -idleBob;
+
+  // --- Reveal animations (zoom-in with overshoot) ---
+  for (const room of rooms) {
+    for (const m of room) {
+      const ud = m.userData;
+      const target = ud.revealed ? 1 : 0;
+      ud.animT += (target - ud.animT) * Math.min(1, dt * 4.5);
+      const e = ud.animT;
+      // easeOutBack for scale (overshoot)
+      const c1 = 1.70158, c3 = c1 + 1;
+      const scaleE = e < 0.001 ? 0 : 1 + c3 * Math.pow(e - 1, 3) + c1 * Math.pow(e - 1, 2);
+      const s = Math.max(0.001, scaleE);
+      m.scale.set(ud.baseScale.x * s, ud.baseScale.y * s, ud.baseScale.z * s);
+      m.traverse(o => {
+        if (o.isMesh && o.material) {
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          for (const mat of mats) {
+            const base = mat.userData.baseOpacity ?? 1;
+            mat.opacity = base * Math.min(1, e * 1.3);
+          }
+        }
+      });
+      if (ud.spin) m.rotation.y += dt * 0.3;
+    }
+  }
+
+  // Flicker lights
+  for (let i = 0; i < roomLights.length; i++) {
+    const rl = roomLights[i];
+    const flick = 0.92 + Math.sin(t * 1.6 + i * 1.3) * 0.05 + Math.sin(t * 7 + i) * 0.03;
+    rl.pl.intensity = rl.base * flick;
+  }
+
+  // Flame flicker (scale + opacity + position wobble)
+  for (const f of flames) {
+    const phase = f.phase;
+    const flick = 0.82 + Math.sin(t * 11 + phase) * 0.1 + Math.sin(t * 23 + phase) * 0.08;
+    f.mesh.scale.set(flick, 0.9 + Math.sin(t * 9 + phase) * 0.15, flick);
+    f.mesh.position.y = f.baseY + Math.sin(t * 6 + phase) * 0.01;
+    f.mesh.material.opacity = 0.85 + Math.sin(t * 13 + phase) * 0.1;
+  }
+  for (const fl of flameLights) {
+    fl.light.intensity = fl.base * (0.7 + Math.sin(t * 12 + fl.phase) * 0.2 + Math.sin(t * 27 + fl.phase) * 0.1);
+  }
+
+  // Particles drift
+  const pa = particles.geometry.attributes.position.array;
+  for (let i = 0; i < partCount; i++) {
+    pa[i*3+1] += Math.sin(t * 0.5 + i) * 0.002 + 0.002;
+    pa[i*3] += Math.sin(t * 0.3 + i * 0.7) * 0.003;
+    if (pa[i*3+1] > ROOM_H) pa[i*3+1] = 0;
+  }
+  particles.geometry.attributes.position.needsUpdate = true;
+
+  // Rotating shafts
+  for (let i = 0; i < shafts.length; i++) {
+    shafts[i].rotation.y = t * 0.2 + i * 0.7;
+  }
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

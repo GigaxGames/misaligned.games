@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Show & Tell — All decks</title>
+<style>
+  :root {
+    --bg: #05050d;
+    --surface: #13131f;
+    --border: rgba(255, 255, 255, 0.07);
+    --gold: #f5c842;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  p.lead {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  nav {
+    width: 100%;
+    max-width: 420px;
+  }
+  ul { list-style: none; }
+  li + li { margin-top: 12px; }
+  a {
+    display: block;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  a:hover, a:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  a .sub {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  a:hover .sub, a:focus-visible .sub {
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+  <h1>Show &amp; Tell</h1>
+  <p class="lead">Decks in this folder</p>
+  <nav>
+    <ul>
+      <li>
+        <a href="week%202/index.html">Week 2
+          <span class="sub">Entropedia</span>
+        </a>
+      </li>
+      <li>
+        <a href="week%203/index.html">Week 3
+          <span class="sub">Entropedia</span>
+        </a>
+      </li>
+      <li>
+        <a href="week%203%203d/index.html">Week 3 — 3D
+          <span class="sub">Entropedia</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</body>
+</html>
