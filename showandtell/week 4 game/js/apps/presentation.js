@@ -3,6 +3,7 @@
    windows with a 70ms stagger. Uses notepad / excel / viewer for content. */
 (function () {
   const IMG = '../week%204/img/';
+  const GIF = './gifs/';
   const STAGGER_MS = 70;
 
   function injectStyles() {
@@ -10,16 +11,22 @@
     const s = document.createElement('style');
     s.id = 'pres-ctrl-styles';
     s.textContent = `
-      .pres-ctrl-body { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); height: 100%; padding: 8px; }
-      .pres-ctrl-btn { width: 56px; height: 56px; font-size: 28px; font-weight: 700;
+      .pres-ctrl-body { display: flex; align-items: stretch; justify-content: center; gap: 3%;
+        background: var(--surface); height: 100%; padding: 6%; box-sizing: border-box;
+        container-type: size; }
+      .pres-ctrl-btn { flex: 0 0 auto; aspect-ratio: 1; height: 100%;
+        min-width: 32px; min-height: 32px;
+        font-size: clamp(14px, 45cqh, 64px); font-weight: 700;
         background: linear-gradient(to bottom, #ffffff, #d7e3f5);
         border: 1px solid #4a6a96; border-radius: 4px; color: #1e3966;
-        cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+        cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; padding: 0; }
       .pres-ctrl-btn:hover { background: linear-gradient(to bottom, #f6faff, #bcd0ea); }
       .pres-ctrl-btn:disabled { opacity: 0.4; cursor: default; }
-      .pres-ctrl-counter { min-width: 72px; text-align: center;
-        font-family: "Consolas", "Courier New", monospace; font-size: 16px; font-weight: 700;
-        color: #1e3966; background: #fff; border: 1px inset var(--shadow-dark); padding: 6px 10px; border-radius: 2px; }
+      .pres-ctrl-counter { flex: 1; min-width: 60px; text-align: center;
+        display: flex; align-items: center; justify-content: center;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: clamp(10px, 22cqh, 28px); font-weight: 700;
+        color: #1e3966; background: #fff; border: 1px inset var(--shadow-dark); border-radius: 2px; padding: 0 4%; }
     `;
     document.head.appendChild(s);
   }
@@ -29,6 +36,7 @@
   const image = (title, name, file) => ({ app: 'viewer', opts: { title, images: [{ name, src: IMG + file }] } });
   const gallery = (title, imgs, extra) => ({ app: 'viewer', opts: Object.assign({ title, images: imgs }, extra || {}) });
   const table = (title, cells) => ({ app: 'excel', opts: { title, cells } });
+  const gif = (title, file) => ({ app: 'viewer', opts: { title, images: [{ name: file, src: GIF + file }] } });
 
   /* Position helper: returns a part with x/y/w/h attached */
   const at = (x, y, w, h, part) => Object.assign({ x, y, w, h }, part);
@@ -39,35 +47,28 @@
     // 0 · TITLE
     [
       at(4, 8, 42, 32, text('Show & Tell',
-        'SHOW & TELL\n' +
-        '===========\n\n' +
-        'Entropedia · Week 4\n' +
-        'April 20–23, 2026\n\n' +
-        '— Supercell')),
-      at(48, 14, 48, 72, image('Play the Alpha', 'play the alpha.jpg', 'play the alpha.jpg'))
+        'SHOW & TELL\n\n' +
+        'April 20–23, 2026')),
+      at(48, 14, 48, 72, image('Play the Alpha', 'play the alpha.jpg', 'play the alpha.jpg')),
+      at(4, 44, 42, 48, gif('Growth', 'growth.gif'))
     ],
 
     // 1 · HYPOTHESIS
     [
       at(4, 8, 56, 26, text('Hypothesis',
-        "THIS WEEK'S HYPOTHESIS\n" +
-        '=======================\n\n' +
+        'HYPOTHESIS\n\n' +
         "Reddit is good for organic growth —\n" +
         "but it's not enough.")),
       at(4, 38, 56, 32, text('Detail',
-        'Organic posts brought the first real wave of players.\n\n' +
-        'Now we need to see what breaks when we push harder —\n' +
-        'and fix the funnel underneath.'))
+        'Push harder. Fix the funnel.')),
+      at(62, 10, 34, 64, gif('Growth', 'growth2.gif'))
     ],
 
     // 2 · REDDIT POSTS + STATS (each screenshot cascades as its own viewer)
     [
       at(4, 6, 54, 18, text('Reddit · Organic',
-        'Hypothesis · Reddit · Organic\n' +
-        '=============================\n\n' +
-        'Posted Across Multiple Angles\n\n' +
-        'Tested different hooks and subs.\n' +
-        '~22K combined views · 82 upvotes.')),
+        'POSTED ACROSS MULTIPLE ANGLES\n\n' +
+        '~22K views · 82 upvotes')),
       at(60, 6, 36, 56, table('By Subreddit', {
         'A1': 'Subreddit', 'B1': 'Upvotes', 'C1': 'Comments', 'D1': 'Views',
         'A2': 'r/godot',      'B2': '4',  'C2': '0',  'D2': '607',
@@ -84,228 +85,164 @@
       at(14, 36, 24, 52, image('Post 3', 'reddit post 3', 'reddit posts/Screenshot 2026-04-24 at 02.02.30.png')),
       at(20, 40, 24, 52, image('Post 4', 'reddit post 4', 'reddit posts/Screenshot 2026-04-24 at 02.02.43.png')),
       at(26, 44, 24, 52, image('Post 5', 'reddit post 5', 'reddit posts/Screenshot 2026-04-24 at 02.02.53.png')),
-      at(32, 48, 24, 52, image('Post 6', 'reddit post 6', 'reddit posts/Screenshot 2026-04-24 at 02.03.09.png'))
+      at(32, 48, 24, 52, image('Post 6', 'reddit post 6', 'reddit posts/Screenshot 2026-04-24 at 02.03.09.png')),
+      at(60, 64, 36, 30, gif('Clip 3', '3.gif'))
     ],
 
     // 3 · ORGANIC CEILING (s2b)
     [
       at(4, 6, 60, 14, text('Organic Ceiling',
-        'Hypothesis · Reddit · Organic\n' +
-        '=============================\n\n' +
-        'Organic Hit a Ceiling')),
+        'ORGANIC HIT A CEILING')),
       at(4, 24, 42, 22, text('Big subs = noise',
-        'BIG SUBS = NOISE\n\n' +
-        'Too much competing content.\n' +
-        'Much more effort per post to differentiate.')),
+        'BIG SUBS = NOISE')),
       at(4, 48, 42, 22, text('Smaller / technical subs',
-        'SMALLER / TECHNICAL SUBS\n\n' +
-        'Engagement, worse conversion.\n' +
-        'Niche audiences interact more,\n' +
-        'but fewer actually play.')),
+        'SMALLER SUBS\n\n' +
+        'Engage more · convert less')),
       at(4, 72, 42, 22, text('Account blocked 3×',
-        'ACCOUNT BLOCKED 3×\n\n' +
-        "Reddit's anti-spam kept suspending the account.\n" +
-        'Unblocked each time, but real friction.')),
-      at(50, 24, 46, 68, image('Reddit account blocked', 'account blocked', 'reddit account blocked.png'))
+        'ACCOUNT BLOCKED 3×')),
+      at(50, 24, 46, 42, image('Reddit account blocked', 'account blocked', 'reddit account blocked.png')),
+      at(50, 68, 46, 26, gif('Clip 4', '4.gif'))
     ],
 
     // 4 · PAID ADS (s3)
     [
       at(4, 6, 54, 18, text('Paid Ads',
-        'Hypothesis · Reddit · Paid\n' +
-        '==========================\n\n' +
-        'First Paid Ads Experiment\n\n' +
-        "Tried Reddit's native promoted posts.")),
-      at(4, 28, 14, 16, text('Budget', '   $50\n\nDaily Budget')),
-      at(20, 28, 14, 16, text('Days',   '   4\n\nDays Running')),
-      at(36, 28, 14, 16, text('Spend',  '   $200\n\nTotal Spend')),
+        'FIRST PAID ADS EXPERIMENT')),
+      at(4, 28, 14, 16, text('Budget', '$50 / day')),
+      at(20, 28, 14, 16, text('Days',   '4 days')),
+      at(36, 28, 14, 16, text('Spend',  '$200 total')),
       at(4, 48, 46, 26, text('Takeaway',
         'TAKEAWAY\n\n' +
-        'Useful baseline — but Reddit alone\n' +
-        "probably isn't the channel that unlocks scale.")),
-      at(54, 28, 42, 64, image('Reddit ad', 'reddit ad', 'reddit ad.png'))
+        "Reddit alone isn't the channel\n" +
+        'that unlocks scale.')),
+      at(54, 28, 42, 42, image('Reddit ad', 'reddit ad', 'reddit ad.png')),
+      at(54, 72, 42, 22, gif('Clip 5', '5.gif'))
     ],
 
     // 5 · SCOUTING CHANNELS (s4)
     [
       at(4, 6, 60, 14, text('Scouting Channels',
-        'Hypothesis · Reddit\n' +
-        '===================\n\n' +
-        'Scouting Other Channels')),
-      at(4, 24, 29, 60, text('Facebook / Instagram',
+        'SCOUTING OTHER CHANNELS')),
+      at(4, 24, 29, 50, text('Facebook / Instagram',
         '[HEAVY]\n\n' +
-        'FACEBOOK / INSTAGRAM\n\n' +
-        'Account-centric platforms.\n' +
-        'Need a whole content/brand presence\n' +
-        'to be worth the spend —\n' +
-        'big lift for one person.')),
-      at(35, 24, 29, 60, text('Google / YouTube / Mobile',
+        'FACEBOOK / INSTAGRAM')),
+      at(35, 24, 29, 50, text('Google / YouTube / Mobile',
         '[PROMISING]\n\n' +
-        'GOOGLE / YOUTUBE / MOBILE\n\n' +
-        'Cheaper intent-based targeting.\n' +
-        'But need real mobile support first —\n' +
-        'otherwise paid mobile traffic\n' +
-        'churns instantly.')),
-      at(66, 24, 29, 60, text('Keep Reddit',
+        'GOOGLE / YOUTUBE')),
+      at(66, 24, 29, 50, text('Keep Reddit',
         '[NEXT]\n\n' +
-        'KEEP REDDIT AS BASELINE\n\n' +
-        'Posts + small paid spend stay.\n' +
-        'Expand once mobile is solid.'))
+        'KEEP REDDIT\nAS BASELINE')),
+      at(4, 76, 91, 18, gif('Clip 6', '6.gif'))
     ],
 
     // 6 · DAU RESPONSE (s4b)
     [
       at(4, 6, 70, 20, text('DAU Response',
-        'Result · Analytics\n' +
-        '==================\n\n' +
-        'DAU Response to Reddit Push\n\n' +
-        'Organic + promoted posts moved the needle —\n' +
-        'but we need more than that.')),
-      at(4, 28, 92, 66, image('PostHog DAU', 'posthog DAU', 'posthog DAU.png'))
+        'DAU RESPONSE TO REDDIT PUSH')),
+      at(4, 28, 56, 66, image('PostHog DAU', 'posthog DAU', 'posthog DAU.png')),
+      at(62, 28, 34, 66, gif('Clip 7', '7.gif'))
     ],
 
     // 7 · LONG SESSIONS (s5)
     [
       at(4, 6, 70, 20, text('Long Sessions',
-        'Retention · Signal\n' +
-        '==================\n\n' +
-        'The Ones Who Stayed — Went Deep\n\n' +
-        'Players who powered through the broken quests\n' +
-        'and brutal CPU racked up long sessions.')),
+        'THE ONES WHO STAYED —\n' +
+        'WENT DEEP')),
       at(4, 30, 46, 20, text('Long sessions from survivors',
-        'LONG SESSIONS FROM SURVIVORS\n\n' +
-        'Once a player gets past the rough edges,\n' +
-        'they stay in for extended play — 30+ minutes.')),
+        'LONG SESSIONS\n\n' +
+        '30+ minutes')),
       at(4, 52, 46, 20, text('Return visits too',
-        'RETURN VISITS TOO\n\n' +
-        'Same users coming back across days —\n' +
-        "even with CPU that was beating them\n" +
-        "and quests they couldn't finish.")),
+        'RETURN VISITS TOO')),
       at(4, 74, 46, 20, text('Implication',
         'IMPLICATION\n\n' +
-        'The depth is already there.\n' +
-        'Fix the entry friction (bounce, CPU, quests)\n' +
-        'and a lot more people make it to the fun.')),
-      at(54, 30, 42, 64, image('Player detail', 'posthog player detail', 'posthog player detail.png'))
+        'Depth is there. Fix entry friction.')),
+      at(54, 30, 42, 42, image('Player detail', 'posthog player detail', 'posthog player detail.png')),
+      at(54, 74, 42, 20, gif('Hit Counter', '8.svg'))
     ],
 
     // 8 · FUNNEL FIXES (s5b)
     [
       at(4, 6, 60, 14, text('Funnel Fixes',
-        'Retention · Fixes\n' +
-        '=================\n\n' +
-        'Reduced Friction at the Entry')),
-      at(4, 24, 29, 56, text('📦 Smaller build',
-        '📦  SMALLER GODOT BUILD\n\n' +
-        'Trimmed build size to cut\n' +
-        'load time on first visit.')),
-      at(35, 24, 29, 56, text('🪄 Landing page loader',
-        '🪄  LANDING PAGE LOADER\n\n' +
-        'Keeps users engaged while\n' +
-        'the game loads —\n' +
-        'no more blank wait.')),
-      at(66, 24, 29, 56, text('📱 Mobile UX + PWA',
-        '📱  MOBILE UX + PWA\n\n' +
-        'Better touch layout,\n' +
-        'installable from the browser.'))
+        'REDUCED FRICTION AT THE ENTRY')),
+      at(4, 24, 29, 42, text('📦 Smaller build',
+        '📦  SMALLER BUILD')),
+      at(35, 24, 29, 42, text('🪄 Landing page loader',
+        '🪄  LANDING PAGE LOADER')),
+      at(66, 24, 29, 42, text('📱 Mobile UX + PWA',
+        '📱  MOBILE UX + PWA')),
+      at(4, 70, 91, 24, gif('Under Construction', '9.svg'))
     ],
 
     // 9 · PAIN POINTS (s6)
     [
       at(4, 6, 60, 14, text('Pain Points',
-        'Retention · Pain Points\n' +
-        '=======================\n\n' +
-        'Fixed for the Players Who Stayed')),
-      at(4, 24, 44, 60, text('CPU too hard',
-        '[FIXED] CPU TOO HARD\n\n' +
-        "New players were bouncing off\n" +
-        "fights they couldn't win.\n\n" +
-        "Nerfed CPU opponents so they're\n" +
-        'actually beatable — ramp feels fair.')),
-      at(52, 24, 44, 60, text('Crafting quests broken',
-        '[FIXED] CRAFTING QUESTS BROKEN\n\n' +
-        'Several crafting quests were unclearable.\n' +
-        'Silent churn driver — repaired this week.'))
+        'FIXED FOR THE PLAYERS WHO STAYED')),
+      at(4, 24, 44, 46, text('CPU too hard',
+        '[FIXED]\n\n' +
+        'CPU TOO HARD\n\n' +
+        'Nerfed.')),
+      at(52, 24, 44, 46, text('Crafting quests broken',
+        '[FIXED]\n\n' +
+        'CRAFTING QUESTS BROKEN')),
+      at(4, 74, 92, 20, gif('Warning', '10.svg'))
     ],
 
     // 10 · GAME MODES (s7) — notepad + viewer for each mode
     [
       at(4, 6, 60, 14, text('New Game Modes',
-        'Hypothesis · Depth\n' +
-        '==================\n\n' +
-        'New Semantic Game Modes')),
+        'NEW SEMANTIC GAME MODES')),
+      at(66, 4, 30, 18, gif('NEW!', '11.svg')),
       // Raid: notepad + image
       at(4, 24, 29, 32, text('Raid',
         '[NEW]\n\n' +
         'RAID\n\n' +
-        'Cooperative PvE.\n' +
-        'Chain builder + raid player\n' +
-        'team up on a shared boss.')),
+        'Cooperative PvE.')),
       at(4, 58, 29, 34, image('Raid', 'raid', 'new gamemodes/RAID.png')),
       // Incremental Semantic
       at(35, 24, 29, 32, text('Incremental Semantic',
         '[NEW]\n\n' +
-        'INCREMENTAL SEMANTIC\n\n' +
-        'Rarity escalates round by round.\n' +
-        'Common → legendary pressure ramp.')),
+        'INCREMENTAL\nSEMANTIC\n\n' +
+        'Rarity ramp.')),
       at(35, 58, 29, 34, image('Escalation', 'escalation mode', 'new gamemodes/escalation mode.png')),
       // Daily Challenge
       at(66, 24, 29, 32, text('Daily Challenge',
         '[NEW]\n\n' +
         'DAILY CHALLENGE\n\n' +
-        "Craft a mythic card matching\n" +
-        "today's target.\n" +
         'Refreshes every 24h.')),
       at(66, 58, 29, 34, image('Daily Challenge', 'daily challenge', 'new gamemodes/daily challenge.png'))
     ],
 
     // 11 · SOCIAL REWARDS (s8)
     [
-      at(4, 6, 70, 22, text('Social Rewards',
-        'Depth · Social\n' +
-        '==============\n\n' +
-        'Rewards That Make Players Show Off\n\n' +
-        'Light social layer so returning players\n' +
-        'have something to earn and display.')),
+      at(4, 6, 58, 22, text('Social Rewards',
+        'REWARDS THAT MAKE\n' +
+        'PLAYERS SHOW OFF')),
+      at(64, 6, 32, 22, gif('Smileys', '12.svg')),
       at(4, 32, 29, 20, text('😀 Emotes',
-        '😀  EMOTES\n\n' +
-        'In-match expression —\n' +
-        'cheering, taunting, reacting.')),
+        '😀  EMOTES')),
       at(4, 54, 29, 40, image('Emoji example', 'emoji example', 'emoji example.mov')),
       at(35, 32, 29, 20, text('🎴 Card backsides',
-        '🎴  CARD BACKSIDES\n\n' +
-        'Cosmetic card backs\n' +
-        'players unlock and equip.')),
+        '🎴  CARD BACKSIDES')),
       at(35, 54, 29, 40, gallery('Card backsides',
         [1,2,3,4,5,6,7,8].map(n => ({ name: 'Card ' + n, src: IMG + 'card%20backside/card_0' + n + '.svg' })),
         { stageBackground: '#fff' })),
       at(66, 32, 29, 20, text('🏆 Player titles',
-        '🏆  PLAYER TITLES\n\n' +
-        'Earnable tags shown next to names —\n' +
-        'light status signal.')),
+        '🏆  PLAYER TITLES')),
       at(66, 54, 29, 40, image('Player titles', 'title example', 'title example.png'))
     ],
 
     // 12 · GRID + RARITY (s9)
     [
       at(4, 6, 60, 14, text('Grid + Rarity',
-        'Status\n' +
-        '======\n\n' +
-        'Grid + Rarity Tuning')),
+        'GRID + RARITY TUNING')),
+      at(66, 4, 30, 18, gif('Legendary', '13.svg')),
       at(4, 24, 46, 32, text('Grid — Internal Playtest',
         '[INTERNAL PLAYTEST]\n\n' +
         'GRID\n\n' +
-        'Played between us this week.\n' +
-        'Mechanically works — but still\n' +
-        'lacking something.\n' +
-        'Needs another design pass\n' +
-        'before we take it out.')),
+        'Needs another design pass.')),
       at(4, 58, 46, 34, text('Rarity matters more',
         '[SHIPPED]\n\n' +
-        'RARITY MATTERS MORE\n\n' +
-        'Updated existing modes to weigh\n' +
-        'rarity more heavily — player-requested.\n' +
-        'Legendary plays now feel legendary.')),
+        'RARITY MATTERS MORE')),
       at(52, 24, 44, 68, image('Grid mode', 'gridmode', 'gridmode.png'))
     ]
   ];
@@ -315,9 +252,13 @@
     id: 'presentation',
     title: 'Presentation',
     icon: '▶',
-    window: { width: 260, height: 96 },
+    window: { width: 340, height: 140 },
     mount(w) {
       injectStyles();
+      /* Size the controller relative to viewport on first open */
+      const vh = window.innerHeight / 100;
+      w.el.style.width = Math.max(280, Math.round(32 * vh)) + 'px';
+      w.el.style.height = Math.max(130, Math.round(13 * vh)) + 'px';
       w.bodyEl.classList.add('pres-ctrl-body');
       w.bodyEl.innerHTML = `
         <button class="pres-ctrl-btn" data-prev>◀</button>

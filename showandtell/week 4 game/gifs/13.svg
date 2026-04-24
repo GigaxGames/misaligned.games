@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="bg13" cx="0.5" cy="0.5">
+      <stop offset="0" stop-color="#2a1a4a"/>
+      <stop offset="1" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="gold13" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8aa"/>
+      <stop offset="0.5" stop-color="#ffcc00"/>
+      <stop offset="1" stop-color="#aa6600"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg13)"/>
+  <g>
+    <g transform="translate(70 100)">
+      <polygon points="0,-30 8,-9 30,-9 12,4 19,26 0,13 -19,26 -12,4 -30,-9 -8,-9" fill="url(#gold13)" stroke="#fff" stroke-width="1.5"/>
+      <animateTransform attributeName="transform" type="rotate" values="0 70 100;360 70 100" dur="4s" repeatCount="indefinite" additive="sum"/>
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/>
+    </g>
+    <g transform="translate(330 100)">
+      <polygon points="0,-30 8,-9 30,-9 12,4 19,26 0,13 -19,26 -12,4 -30,-9 -8,-9" fill="url(#gold13)" stroke="#fff" stroke-width="1.5"/>
+      <animateTransform attributeName="transform" type="rotate" values="360 330 100;0 330 100" dur="4s" repeatCount="indefinite" additive="sum"/>
+      <animate attributeName="opacity" values="1;0.4;1" dur="1.4s" repeatCount="indefinite"/>
+    </g>
+  </g>
+  <text x="200" y="90" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="46" font-weight="bold" fill="url(#gold13)" stroke="#fff" stroke-width="0.8">
+    Legendary !
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="1.2s" repeatCount="indefinite"/>
+  </text>
+  <text x="200" y="125" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="14" fill="#ffcc66">✦ mythic rarity unlocked ✦</text>
+  <g fill="#ffffaa">
+    <circle cx="50" cy="30" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" repeatCount="indefinite"/></circle>
+    <circle cx="120" cy="60" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" begin="0.3s" repeatCount="indefinite"/></circle>
+    <circle cx="280" cy="40" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" begin="0.6s" repeatCount="indefinite"/></circle>
+    <circle cx="360" cy="70" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" begin="0.9s" repeatCount="indefinite"/></circle>
+    <circle cx="90" cy="160" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" begin="0.15s" repeatCount="indefinite"/></circle>
+    <circle cx="310" cy="170" r="2"><animate attributeName="opacity" values="0;1;0" dur="1.3s" begin="0.75s" repeatCount="indefinite"/></circle>
+  </g>
+</svg>

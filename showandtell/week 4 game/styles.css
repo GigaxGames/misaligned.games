@@ -142,7 +142,8 @@ body {
 }
 
 .win-title {
-  height: 22px;
+  height: calc(2.6vh * var(--app-zoom, 1));
+  min-height: 20px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -153,6 +154,7 @@ body {
   text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
   cursor: default;
   flex: 0 0 auto;
+  font-size: calc(1.4vh * var(--app-zoom, 1));
 }
 .win.active .win-title { background: var(--title-a); }
 .win-icon {
@@ -166,7 +168,7 @@ body {
 }
 .win-label {
   flex: 1;
-  font-size: 11px;
+  font-size: calc(1.4vh * var(--app-zoom, 1));
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -207,13 +209,14 @@ body {
   position: relative;
 }
 .win-status {
-  height: 18px;
+  height: calc(2.1vh * var(--app-zoom, 1));
+  min-height: 16px;
   border-top: 1px solid var(--shadow-dark);
   box-shadow: inset 0 1px 0 #fff;
   display: flex;
   align-items: center;
   padding: 0 6px;
-  font-size: 11px;
+  font-size: calc(1.3vh * var(--app-zoom, 1));
   color: #333;
   gap: 12px;
   flex: 0 0 auto;
@@ -725,10 +728,11 @@ input[type="text"], input[type="email"], input[type="number"], input[type="searc
 textarea { resize: none; }
 
 .menu-bar {
-  height: 20px;
+  height: calc(2.4vh * var(--app-zoom, 1));
+  min-height: 18px;
   display: flex;
   align-items: center;
-  font-size: 11px;
+  font-size: calc(1.4vh * var(--app-zoom, 1));
   padding: 0 2px;
   background: var(--surface);
   border-bottom: 1px solid var(--shadow-dark);
@@ -780,9 +784,9 @@ textarea { resize: none; }
 .notepad-area {
   flex: 1;
   border: 0;
-  padding: 8px;
+  padding: 0.8vh;
   font-family: "Lucida Console", Consolas, monospace;
-  font-size: 16px;
+  font-size: calc(1.9vh * var(--app-zoom, 1));
   line-height: 1.45;
   background: #fff;
   resize: none;

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="rainbow11" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#ff0033"/>
+      <stop offset="0.2" stop-color="#ff8800"/>
+      <stop offset="0.4" stop-color="#ffee00"/>
+      <stop offset="0.6" stop-color="#22dd33"/>
+      <stop offset="0.8" stop-color="#33aaff"/>
+      <stop offset="1"   stop-color="#cc33ff"/>
+      <animate attributeName="x1" values="0;-1;0" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="1;0;1" dur="3s" repeatCount="indefinite"/>
+    </linearGradient>
+    <filter id="bev11" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+  <rect width="400" height="200" fill="#000033"/>
+  <g font-family="Impact,Arial Black,sans-serif" font-weight="900" font-size="110" text-anchor="middle">
+    <text x="202" y="137" fill="#000" filter="url(#bev11)" opacity="0.7">NEW!</text>
+    <text x="200" y="135" fill="url(#rainbow11)" stroke="#fff" stroke-width="1.5">NEW!
+      <animateTransform attributeName="transform" type="rotate" values="-3 200 135;3 200 135;-3 200 135" dur="1s" repeatCount="indefinite"/>
+    </text>
+  </g>
+  <g fill="#ffff00">
+    <polygon points="40,40 46,54 60,54 49,63 54,78 40,68 26,78 31,63 20,54 34,54">
+      <animate attributeName="opacity" values="1;0;1" dur="0.6s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="360,40 366,54 380,54 369,63 374,78 360,68 346,78 351,63 340,54 354,54">
+      <animate attributeName="opacity" values="0;1;0" dur="0.6s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="40,160 46,174 60,174 49,183 54,198 40,188 26,198 31,183 20,174 34,174">
+      <animate attributeName="opacity" values="0;1;0" dur="0.6s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="360,160 366,174 380,174 369,183 374,198 360,188 346,198 351,183 340,174 354,174">
+      <animate attributeName="opacity" values="1;0;1" dur="0.6s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+</svg>

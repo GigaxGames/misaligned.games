@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="bg8" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4400aa"/>
+      <stop offset="1" stop-color="#000066"/>
+    </linearGradient>
+    <linearGradient id="lcd8" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#002200"/>
+      <stop offset="1" stop-color="#003300"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg8)"/>
+  <text x="200" y="38" text-anchor="middle" font-family="Impact,sans-serif" font-size="22" fill="#ffff00" font-weight="900">YOU ARE VISITOR</text>
+  <rect x="70" y="58" width="260" height="90" fill="url(#lcd8)" stroke="#ffff00" stroke-width="4"/>
+  <g font-family="Courier New,monospace" font-size="56" font-weight="bold" fill="#33ff66">
+    <text x="90" y="123">0</text>
+    <text x="128" y="123">0</text>
+    <text x="166" y="123">1</text>
+    <text x="204" y="123">3</text>
+    <text x="242" y="123">3</text>
+    <text x="280" y="123">7
+      <animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/>
+    </text>
+  </g>
+  <text x="200" y="178" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="13" fill="#ffffff">~ thanks for stopping by! ~
+    <animate attributeName="fill" values="#ffffff;#ff66cc;#66ffcc;#ffffff" dur="3s" repeatCount="indefinite"/>
+  </text>
+</svg>

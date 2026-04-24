@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="face12" cx="0.35" cy="0.35">
+      <stop offset="0" stop-color="#ffff99"/>
+      <stop offset="0.9" stop-color="#ffcc00"/>
+      <stop offset="1" stop-color="#cc9900"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="200" fill="#aaddff"/>
+  <g>
+    <circle cx="70" cy="100" r="34" fill="url(#face12)" stroke="#663300" stroke-width="2"/>
+    <circle cx="60" cy="92" r="4" fill="#000"/>
+    <circle cx="80" cy="92" r="4" fill="#000"/>
+    <path d="M 55 108 Q 70 122 85 108" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -12;0 0" dur="0.6s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle cx="155" cy="100" r="34" fill="url(#face12)" stroke="#663300" stroke-width="2"/>
+    <circle cx="145" cy="92" r="4" fill="#000"/>
+    <circle cx="165" cy="92" r="4" fill="#000"/>
+    <path d="M 140 115 Q 155 100 170 115" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <animateTransform attributeName="transform" type="translate" values="0 -6;0 -18;0 -6" dur="0.6s" begin="0.15s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle cx="240" cy="100" r="34" fill="url(#face12)" stroke="#663300" stroke-width="2"/>
+    <path d="M 228 95 L 236 92 M 244 92 L 252 95" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="240" cy="112" rx="10" ry="7" fill="#cc0033"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -12;0 0" dur="0.6s" begin="0.3s" repeatCount="indefinite"/>
+  </g>
+  <g>
+    <circle cx="325" cy="100" r="34" fill="url(#face12)" stroke="#663300" stroke-width="2"/>
+    <line x1="315" y1="88" x2="315" y2="96" stroke="#000" stroke-width="3"/>
+    <line x1="335" y1="88" x2="335" y2="96" stroke="#000" stroke-width="3"/>
+    <path d="M 310 115 Q 325 125 340 115" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <animateTransform attributeName="transform" type="translate" values="0 -6;0 -18;0 -6" dur="0.6s" begin="0.45s" repeatCount="indefinite"/>
+  </g>
+  <text x="200" y="32" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="18" font-weight="bold" fill="#cc0066">♥ welcome to my page ♥</text>
+  <text x="200" y="185" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="13" fill="#663300">sign my guestbook!!</text>
+</svg>

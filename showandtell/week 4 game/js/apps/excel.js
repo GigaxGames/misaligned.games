@@ -10,19 +10,21 @@
     s.textContent = `
       .excel-body { display: flex; flex-direction: column; background: var(--surface); height: 100%; }
       .excel-fbar { display: flex; align-items: center; gap: 4px; padding: 3px 4px; background: var(--surface); border-bottom: 1px solid var(--shadow-dark); }
-      .excel-fbar .excel-ref { width: 56px; padding: 2px 4px; font-family: "Tahoma", sans-serif; font-weight: 700; text-align: center; background: #fff; border: 1px inset var(--shadow-dark); }
+      .excel-fbar { font-size: calc(1.5vh * var(--app-zoom, 1)); }
+      .excel-fbar .excel-ref { width: calc(6vh * var(--app-zoom, 1)); padding: 2px 4px; font-family: "Tahoma", sans-serif; font-weight: 700; text-align: center; background: #fff; border: 1px inset var(--shadow-dark); }
       .excel-fbar .excel-fx { color: #b1331b; font-weight: 700; font-style: italic; padding: 0 4px; }
-      .excel-fbar .excel-finput { flex: 1; padding: 2px 4px; font-family: "Consolas", "Courier New", monospace; background: #fff; border: 1px inset var(--shadow-dark); min-height: 14px; }
+      .excel-fbar .excel-finput { flex: 1; padding: 2px 4px; font-family: "Consolas", "Courier New", monospace; background: #fff; border: 1px inset var(--shadow-dark); min-height: 1.6vh; }
       .excel-scroll { flex: 1; overflow: auto; background: #fff; }
-      .excel-grid { border-collapse: collapse; table-layout: fixed; font-family: "Tahoma", sans-serif; font-size: 15px; }
-      .excel-grid th, .excel-grid td { border: 1px solid #c6c3b6; height: 26px; width: 108px; vertical-align: middle; padding: 0 5px; }
+      .excel-grid { border-collapse: collapse; table-layout: fixed; font-family: "Tahoma", sans-serif; font-size: calc(1.7vh * var(--app-zoom, 1)); }
+      .excel-grid th, .excel-grid td { border: 1px solid #c6c3b6; height: calc(2.8vh * var(--app-zoom, 1)); width: calc(8vh * var(--app-zoom, 1)); vertical-align: middle; padding: 0 0.5vh; }
+      .excel-grid th.row-head, .excel-grid th.corner { width: calc(3vh * var(--app-zoom, 1)); }
       .excel-grid th { background: linear-gradient(to bottom, #eceae1, #d4d0c4); color: #333; text-align: center; font-weight: 400; user-select: none; position: sticky; top: 0; z-index: 2; }
-      .excel-grid th.row-head { position: sticky; left: 0; top: auto; z-index: 1; width: 32px; }
-      .excel-grid th.corner { position: sticky; left: 0; top: 0; z-index: 3; width: 32px; }
+      .excel-grid th.row-head { position: sticky; left: 0; top: auto; z-index: 1; width: calc(3.2vh * var(--app-zoom, 1)); }
+      .excel-grid th.corner { position: sticky; left: 0; top: 0; z-index: 3; width: calc(3.2vh * var(--app-zoom, 1)); }
       .excel-grid td { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; background: #fff; }
       .excel-grid td.num { text-align: right; font-variant-numeric: tabular-nums; }
       .excel-grid td.active { outline: 2px solid #1746c4; outline-offset: -2px; background: #e8efff; }
-      .excel-status { display: flex; align-items: center; gap: 8px; padding: 2px 6px; background: var(--surface); border-top: 1px solid var(--shadow-dark); font-size: 10px; color: #333; }
+      .excel-status { display: flex; align-items: center; gap: 8px; padding: 2px 6px; background: var(--surface); border-top: 1px solid var(--shadow-dark); font-size: calc(1.3vh * var(--app-zoom, 1)); color: #333; }
       .excel-status .spacer { flex: 1; }
     `;
     document.head.appendChild(s);

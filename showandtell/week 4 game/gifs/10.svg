@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <rect width="400" height="200" fill="#111"/>
+  <g transform="translate(200 105)">
+    <g>
+      <polygon points="0,-70 80,70 -80,70" fill="#ffcc00" stroke="#000" stroke-width="6" stroke-linejoin="round"/>
+      <text x="0" y="52" text-anchor="middle" font-family="Impact,sans-serif" font-size="86" font-weight="900" fill="#000">!</text>
+      <animateTransform attributeName="transform" type="rotate" values="-6;6;-6" dur="0.3s" repeatCount="indefinite"/>
+    </g>
+  </g>
+  <text x="200" y="25" text-anchor="middle" font-family="Impact,sans-serif" font-size="20" fill="#ff3333" font-weight="900">
+    WARNING !! WARNING !!
+    <animate attributeName="opacity" values="1;0.2;1" dur="0.4s" repeatCount="indefinite"/>
+  </text>
+  <text x="200" y="188" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="12" fill="#ff6666">— proceed with caution —</text>
+</svg>

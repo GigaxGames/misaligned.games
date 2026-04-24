@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <pattern id="stripes9" patternUnits="userSpaceOnUse" width="56" height="56" patternTransform="rotate(45)">
+      <rect width="28" height="56" fill="#ffcc00"/>
+      <rect x="28" width="28" height="56" fill="#000000"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" fill="url(#stripes9)">
+    <animate attributeName="x" values="-56;0" dur="1.2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="24" y="62" width="352" height="76" fill="#ffcc00" stroke="#000" stroke-width="5"/>
+  <text x="200" y="105" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="32" font-weight="900" fill="#000">UNDER CONSTRUCTION</text>
+  <text x="200" y="128" text-anchor="middle" font-family="Comic Sans MS,cursive" font-size="13" fill="#aa0000" font-weight="bold">
+    pardon our dust!
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </text>
+</svg>
