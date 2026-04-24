@@ -11,15 +11,17 @@
       .viewer-toolbar .spacer { flex: 1; }
       .viewer-toolbar .viewer-title { font-weight: 700; font-size: 11px; padding: 0 6px; }
       .viewer-stage {
-        flex: 1; min-height: 0;
+        flex: 1; min-width: 0; min-height: 0;
         display: flex; align-items: center; justify-content: center;
         background: #1a1a1a;
         overflow: hidden;
         position: relative;
+        padding: 8px;
       }
-      .viewer-stage img {
+      .viewer-stage img, .viewer-stage video {
         max-width: 100%; max-height: 100%;
-        image-rendering: pixelated;
+        width: auto; height: auto;
+        object-fit: contain;
         box-shadow: 0 6px 24px rgba(0,0,0,0.5);
       }
       .viewer-nav {
@@ -172,8 +174,12 @@
     icon: '🖼',
     multi: true,
     window: { width: 560, height: 440 },
-    mount(w) {
+    mount(w, opts) {
       injectStyles();
+      opts = opts || {};
+      const items = (opts.images && opts.images.length) ? opts.images : SAMPLES;
+      const isVideo = src => /\.(mov|mp4|webm|ogg)(\?|$)/i.test(String(src));
+      if (opts.title) w.setTitle(opts.title + ' — Image Viewer');
       w.bodyEl.classList.add('viewer-body');
       w.bodyEl.innerHTML = `
         <div class="viewer-toolbar">
@@ -182,16 +188,16 @@
           <span class="spacer"></span>
           <span class="viewer-title" data-name></span>
         </div>
-        <div class="viewer-stage">
+        <div class="viewer-stage"${opts.stageBackground ? ` style="background:${opts.stageBackground}"` : ''}>
           <button class="viewer-nav prev" data-prev>‹</button>
-          <img data-img alt="">
+          <div data-media style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden"></div>
           <button class="viewer-nav next" data-next>›</button>
         </div>
         <div class="viewer-strip" data-strip></div>
         <div class="viewer-status"><span data-status>Loading…</span><span class="spacer"></span><span data-index></span></div>
       `;
 
-      const imgEl = w.bodyEl.querySelector('[data-img]');
+      const mediaEl = w.bodyEl.querySelector('[data-media]');
       const nameEl = w.bodyEl.querySelector('[data-name]');
       const strip = w.bodyEl.querySelector('[data-strip]');
       const statusEl = w.bodyEl.querySelector('[data-status]');
@@ -200,13 +206,28 @@
       let idx = 0;
 
       function show(i) {
-        idx = (i + SAMPLES.length) % SAMPLES.length;
-        const img = SAMPLES[idx];
-        imgEl.src = img.src;
-        imgEl.alt = img.name;
-        nameEl.textContent = img.name;
-        statusEl.textContent = img.name;
-        indexEl.textContent = `${idx + 1} / ${SAMPLES.length}`;
+        idx = (i + items.length) % items.length;
+        const item = items[idx];
+        mediaEl.innerHTML = '';
+        let el;
+        if (isVideo(item.src)) {
+          el = document.createElement('video');
+          el.src = item.src;
+          el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; el.controls = true;
+        } else {
+          el = document.createElement('img');
+          el.src = item.src;
+          el.alt = item.name || '';
+        }
+        el.style.maxWidth = '100%';
+        el.style.maxHeight = '100%';
+        el.style.width = 'auto';
+        el.style.height = 'auto';
+        el.style.objectFit = 'contain';
+        mediaEl.appendChild(el);
+        nameEl.textContent = item.name || '';
+        statusEl.textContent = item.name || '';
+        indexEl.textContent = `${idx + 1} / ${items.length}`;
         strip.querySelectorAll('.viewer-thumb').forEach((t, n) => {
           t.classList.toggle('active', n === idx);
         });
@@ -214,14 +235,26 @@
         if (active) active.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
       }
 
-      SAMPLES.forEach((img, i) => {
+      items.forEach((item, i) => {
         const t = document.createElement('div');
         t.className = 'viewer-thumb';
-        t.style.backgroundImage = `url("${img.src}")`;
-        t.title = img.name;
+        if (isVideo(item.src)) {
+          t.style.background = '#222';
+          t.textContent = '▶';
+          t.style.color = '#fff';
+          t.style.display = 'flex';
+          t.style.alignItems = 'center';
+          t.style.justifyContent = 'center';
+          t.style.fontSize = '20px';
+        } else {
+          t.style.backgroundImage = `url("${item.src}")`;
+        }
+        t.title = item.name || '';
         t.addEventListener('click', () => show(i));
         strip.appendChild(t);
       });
+
+      if (items.length <= 1) strip.style.display = 'none';
 
       w.bodyEl.querySelectorAll('[data-prev]').forEach(b => b.addEventListener('click', () => show(idx - 1)));
       w.bodyEl.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => show(idx + 1)));

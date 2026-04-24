@@ -23,8 +23,10 @@ WM.registerApp({
 
     let currentPath = opts.path || null;
     let dirty = false;
+    const customTitle = opts.title || null;
 
     function setTitle() {
+      if (customTitle) { w.setTitle((dirty ? '*' : '') + customTitle + ' — Notepad'); return; }
       const name = currentPath ? currentPath.split(/[\\/]/).pop() : 'Untitled';
       w.setTitle((dirty ? '*' : '') + name + ' — Notepad');
     }
@@ -40,11 +42,15 @@ WM.registerApp({
     }
 
     if (opts.path) loadPath(opts.path);
+    else if (opts.content != null) { area.value = opts.content; setTitle(); setTimeout(updateStatus, 0); }
     else setTitle();
 
     area.addEventListener('input', () => { dirty = true; setTitle(); updateStatus(); });
     area.addEventListener('keyup', updateStatus);
     area.addEventListener('click', updateStatus);
+
+    /* Pick up the current global zoom level */
+    if (window.AppZoom) setTimeout(() => window.AppZoom.apply(), 0);
 
     function updateStatus() {
       const val = area.value;

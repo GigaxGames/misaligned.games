@@ -14,8 +14,8 @@
       .excel-fbar .excel-fx { color: #b1331b; font-weight: 700; font-style: italic; padding: 0 4px; }
       .excel-fbar .excel-finput { flex: 1; padding: 2px 4px; font-family: "Consolas", "Courier New", monospace; background: #fff; border: 1px inset var(--shadow-dark); min-height: 14px; }
       .excel-scroll { flex: 1; overflow: auto; background: #fff; }
-      .excel-grid { border-collapse: collapse; table-layout: fixed; font-family: "Tahoma", sans-serif; font-size: 11px; }
-      .excel-grid th, .excel-grid td { border: 1px solid #c6c3b6; height: 18px; width: 72px; vertical-align: middle; padding: 0 3px; }
+      .excel-grid { border-collapse: collapse; table-layout: fixed; font-family: "Tahoma", sans-serif; font-size: 15px; }
+      .excel-grid th, .excel-grid td { border: 1px solid #c6c3b6; height: 26px; width: 108px; vertical-align: middle; padding: 0 5px; }
       .excel-grid th { background: linear-gradient(to bottom, #eceae1, #d4d0c4); color: #333; text-align: center; font-weight: 400; user-select: none; position: sticky; top: 0; z-index: 2; }
       .excel-grid th.row-head { position: sticky; left: 0; top: auto; z-index: 1; width: 32px; }
       .excel-grid th.corner { position: sticky; left: 0; top: 0; z-index: 3; width: 32px; }
@@ -49,8 +49,11 @@
     icon: '📊',
     multi: true,
     window: { width: 640, height: 440 },
-    mount(w) {
+    mount(w, opts) {
       injectStyles();
+      opts = opts || {};
+      const DATA = opts.cells || SEED;
+      if (opts.title) w.setTitle(opts.title + ' — Excel');
       w.bodyEl.classList.add('excel-body');
       w.bodyEl.innerHTML = `
         <div class="menu-bar">
@@ -100,7 +103,7 @@
         for (let c = 0; c < COLS; c++) {
           const td = document.createElement('td');
           const key = colLetter(c) + (r + 1);
-          const v = SEED[key];
+          const v = DATA[key];
           if (v != null) {
             td.textContent = v;
             if (!isNaN(parseFloat(v)) && /^-?[0-9]*\.?[0-9]+$/.test(String(v).trim())) td.classList.add('num');
@@ -125,6 +128,9 @@
 
       const first = grid.querySelector('td');
       if (first) { first.classList.add('active'); active = first; }
+
+      /* Pick up the current global zoom level */
+      if (window.AppZoom) setTimeout(() => window.AppZoom.apply(), 0);
     }
   });
 })();
