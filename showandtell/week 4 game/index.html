@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Show and Tell · Week 4</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+<div id="boot-screen">
+  <div class="boot-logo">
+    <div class="boot-flag">
+      <span class="bf r"></span><span class="bf g"></span>
+      <span class="bf b"></span><span class="bf y"></span>
+    </div>
+    <div class="boot-wordmark">
+      <div class="boot-brand">Show and Tell</div>
+      <div class="boot-product">Week<span class="boot-xp">Four</span></div>
+    </div>
+  </div>
+  <div class="boot-progress"><div class="boot-progress-bar"></div></div>
+  <div class="boot-status" id="boot-status">Starting…</div>
+  <div class="boot-login" id="boot-login" hidden>
+    <div class="boot-login-title">SHOW AND TELL WEEK 4</div>
+    <button class="boot-login-btn primary" id="boot-login-enter">Enter</button>
+    <div class="boot-login-msg" id="boot-login-msg"></div>
+  </div>
+  <div class="boot-prompt" id="boot-prompt" hidden>Click anywhere to continue</div>
+  <div class="boot-copy">Show and Tell · Week 4</div>
+</div>
+
+<div id="desktop">
+  <div id="icons"></div>
+  <div id="windows"></div>
+  <div id="selection-box" hidden></div>
+</div>
+
+<div id="taskbar">
+  <button id="start-btn" class="start">
+    <span class="start-flag"></span>
+    <span>Start</span>
+  </button>
+  <div id="taskbar-apps"></div>
+  <div id="tray">
+    <span id="tray-volume" title="Volume">♪</span>
+    <span id="tray-net" title="Network">⌘</span>
+    <span id="tray-clock" title=""></span>
+  </div>
+</div>
+
+<div id="start-menu" hidden>
+  <div class="start-banner">
+    <span class="banner-user" id="start-user">Guest</span>
+    <span class="banner-tag">Show and Tell · Week 4</span>
+  </div>
+  <div class="start-body">
+    <ul id="start-list"></ul>
+    <div class="start-sep"></div>
+    <ul class="start-footer">
+      <li data-action="about"><span class="icn i-info"></span> About</li>
+      <li data-action="shutdown"><span class="icn i-power"></span> Shut Down…</li>
+    </ul>
+  </div>
+</div>
+
+<div id="context-menu" hidden></div>
+<div id="toast-layer"></div>
+
+<template id="tpl-window">
+  <div class="win" role="dialog">
+    <div class="win-title">
+      <span class="win-icon"></span>
+      <span class="win-label">Untitled</span>
+      <div class="win-ctrls">
+        <button class="wb wb-min" title="Minimize">_</button>
+        <button class="wb wb-max" title="Maximize">▢</button>
+        <button class="wb wb-close" title="Close">×</button>
+      </div>
+    </div>
+    <div class="win-body"></div>
+    <div class="win-status" hidden></div>
+    <div class="resize rz-n"></div><div class="resize rz-s"></div>
+    <div class="resize rz-e"></div><div class="resize rz-w"></div>
+    <div class="resize rz-ne"></div><div class="resize rz-nw"></div>
+    <div class="resize rz-se"></div><div class="resize rz-sw"></div>
+  </div>
+</template>
+
+<script src="./js/wm.js"></script>
+<script src="./js/settings.js"></script>
+<script src="./js/sounds.js"></script>
+<script src="./js/fs.js"></script>
+<script src="./js/apps/clock.js"></script>
+<script src="./js/apps/notepad.js"></script>
+<script src="./js/apps/excel.js"></script>
+<script src="./js/apps/viewer.js"></script>
+<script src="./js/apps/presentation.js"></script>
+<script src="./js/apps/explorer.js"></script>
+<script src="./js/apps/controlpanel.js"></script>
+<script src="./js/apps/email.js"></script>
+<script src="./js/apps/meeting.js"></script>
+<script src="./js/apps/minesweeper.js"></script>
+<script src="./js/apps/datalabel.js"></script>
+<script src="./js/apps/about.js"></script>
+<script src="./js/desktop.js"></script>
+
+</body>
+</html>

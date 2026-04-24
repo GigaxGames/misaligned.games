@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Daily Standup",
+    "time": "Today · 10:00",
+    "attendees": [
+      { "name": "Dave", "avatar": "🧑‍💼" },
+      { "name": "Aki", "avatar": "🦊" },
+      { "name": "Petra", "avatar": "🐸" },
+      { "name": "Marco", "avatar": "😎" }
+    ],
+    "chat": [
+      { "who": "Dave", "text": "morning everyone 👋" },
+      { "who": "Aki", "text": "morning." },
+      { "who": "Petra", "text": "hiiii ✨" },
+      { "who": "Marco", "text": "yo" },
+      { "who": "Dave", "text": "who's kicking off?" },
+      { "who": "Aki", "text": "I'll go." },
+      { "who": "Petra", "text": "my camera is dying one sec" },
+      { "who": "Dave", "text": "no worries, we can hear you" },
+      { "who": "Marco", "text": "can we? your mic sounds like a tunnel" },
+      { "who": "Petra", "text": "😤" },
+      { "who": "Dave", "text": "ok let's keep it moving" }
+    ]
+  },
+  {
+    "title": "Sync with Dave",
+    "time": "Today · 14:00",
+    "attendees": [
+      { "name": "Dave", "avatar": "🧑‍💼" }
+    ],
+    "chat": [
+      { "who": "Dave", "text": "so... the thing." },
+      { "who": "Dave", "text": "how do we feel about the thing" },
+      { "who": "Dave", "text": "honestly" },
+      { "who": "Dave", "text": "between us" }
+    ]
+  },
+  {
+    "title": "All-Hands ('optional')",
+    "time": "Today · 16:00",
+    "attendees": [
+      { "name": "CEO", "avatar": "🧔" },
+      { "name": "Dave", "avatar": "🧑‍💼" },
+      { "name": "Sharon", "avatar": "👩‍💼" },
+      { "name": "Marco", "avatar": "😎" },
+      { "name": "Aki", "avatar": "🦊" },
+      { "name": "Petra", "avatar": "🐸" },
+      { "name": "Linda", "avatar": "👩" }
+    ],
+    "chat": [
+      { "who": "CEO", "text": "thanks for joining everyone" },
+      { "who": "CEO", "text": "I want to talk about Q-something" },
+      { "who": "Sharon", "text": "(reminder: cameras on)" },
+      { "who": "Marco", "text": "my battery just died 🔋" },
+      { "who": "Aki", "text": "mm-hmm" },
+      { "who": "Petra", "text": "🐸" },
+      { "who": "CEO", "text": "...anyway, synergy." },
+      { "who": "Linda", "text": "the copier is down again" }
+    ]
+  },
+  {
+    "title": "1:1 with HR",
+    "time": "Tomorrow · 09:30",
+    "attendees": [
+      { "name": "Sharon", "avatar": "👩‍💼" }
+    ],
+    "chat": [
+      { "who": "Sharon", "text": "This session is being recorded." },
+      { "who": "Sharon", "text": "Please confirm you have reviewed Policy 4.2." }
+    ]
+  }
+]

@@ -1,0 +1,161 @@
+[
+  {
+    "name": "Dave (Manager)",
+    "email": "dave@hotmail.com",
+    "avatar": "🧑‍💼",
+    "status": "online",
+    "tagline": "in back-to-backs 🙃",
+    "greeting": "hey, got a sec?",
+    "replies": [
+      "cool cool",
+      "can you hop on a quick call?",
+      "let's circle back on that",
+      "I'll send a calendar invite",
+      "yeah no totally",
+      "ok ok ok",
+      "can you own that?",
+      "sounds like a you problem tbh",
+      "lol",
+      "jk. kinda."
+    ]
+  },
+  {
+    "name": "Kevin (IT)",
+    "email": "kevin@hotmail.com",
+    "avatar": "🧑‍🔧",
+    "status": "online",
+    "tagline": "turn it off and on again",
+    "greeting": "what did you break",
+    "replies": [
+      "have you tried turning it off and on again",
+      "it's not the network",
+      "it's never the network",
+      "check the cable",
+      "yeah that's normal",
+      "mhm",
+      "did you clear the cache",
+      "that's a hardware issue",
+      "I'll remote in, move your mouse",
+      "lol no"
+    ]
+  },
+  {
+    "name": "Linda (Reception)",
+    "email": "linda@hotmail.com",
+    "avatar": "👩",
+    "status": "online",
+    "tagline": "please stop asking about the copier",
+    "greeting": "hiiiii 💕",
+    "replies": [
+      "omg tell me everything",
+      "you did NOT",
+      "spill ☕",
+      "girl",
+      "no way",
+      "guess who just walked in",
+      "the copier is down again",
+      "don't tell Dave",
+      "brb customer"
+    ]
+  },
+  {
+    "name": "Sharon (HR)",
+    "email": "sharon@hotmail.com",
+    "avatar": "👩‍💼",
+    "status": "busy",
+    "tagline": "do not disturb unless re: policy",
+    "greeting": "This conversation is being logged for compliance.",
+    "replies": [
+      "Please put that in writing.",
+      "I'll follow up via email.",
+      "That would need to go through HR.",
+      "Have you completed your annual training?",
+      "Policy 4.2 covers this.",
+      "Mandatory session is Friday.",
+      "Please RSVP.",
+      "That's not an HR matter."
+    ]
+  },
+  {
+    "name": "Marco",
+    "email": "marco_ftw@hotmail.com",
+    "avatar": "😎",
+    "status": "away",
+    "tagline": "☕ coffee run",
+    "greeting": "yo",
+    "replies": [
+      "yo",
+      "what up",
+      "lmaooo",
+      "bet",
+      "come downstairs",
+      "you want one?",
+      "nope",
+      "afk sec",
+      "back"
+    ]
+  },
+  {
+    "name": "Aki",
+    "email": "aki@hotmail.com",
+    "avatar": "🦊",
+    "status": "away",
+    "tagline": "head down — deep work",
+    "greeting": "I have 2 minutes, make it count.",
+    "replies": [
+      "mm-hmm",
+      "interesting.",
+      "write it up and send",
+      "later",
+      "can it wait",
+      "sure.",
+      "fine."
+    ]
+  },
+  {
+    "name": "Petra",
+    "email": "petra@hotmail.com",
+    "avatar": "🐸",
+    "status": "online",
+    "tagline": "accepting memes 24/7",
+    "greeting": "wanna see a meme",
+    "replies": [
+      "lolol",
+      "stealing that",
+      "🐸🐸🐸",
+      "send more",
+      "hahahaa",
+      "you've doomed us all",
+      "dead 💀",
+      "perfection"
+    ]
+  },
+  {
+    "name": "Nico",
+    "email": "nico_99@hotmail.com",
+    "avatar": "🧑",
+    "status": "offline",
+    "tagline": "Last seen Tuesday",
+    "replies": [
+      "..."
+    ]
+  },
+  {
+    "name": "Mum",
+    "email": "mum@hotmail.com",
+    "avatar": "👩‍🦳",
+    "status": "online",
+    "tagline": "are you eating?",
+    "greeting": "are you eating properly?",
+    "replies": [
+      "are you eating?",
+      "you should come over Sunday",
+      "your cousin says hi",
+      "have you called your sister",
+      "dad says turn the heating down",
+      "I sent you something in the post",
+      "did you get the cake tin back to aunt M",
+      "love you"
+    ]
+  }
+]

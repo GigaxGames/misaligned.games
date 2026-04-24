@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropedia — Show & Tell Week 4</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c842;
+    --blue: #5b9cf6;
+    --green: #4ecca3;
+    --red: #f06680;
+    --purple: #a78bfa;
+    --orange: #f59e42;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #05050d;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    height: 100vh; width: 100vw;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; user-select: none;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background: rgba(5,5,13,.82);
+    z-index:0;
+  }
+
+  #particles {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+
+  #deck { position:relative; width:96vw; height:88vh; max-width:1600px; max-height:900px; z-index:1; }
+
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 64px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateX(60px) scale(.97);
+    transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  }
+  .slide.active   { opacity:1; pointer-events:all; transform:translateX(0) scale(1); }
+  .slide.exit     { opacity:0; transform:translateX(-60px) scale(.97); pointer-events:none; }
+
+  .accent {
+    position: absolute; top:0; left:64px; right:64px; height:3px;
+    border-radius: 0 0 3px 3px;
+  }
+  .accent.gold   { background: linear-gradient(90deg, var(--gold), transparent 80%); }
+  .accent.blue   { background: linear-gradient(90deg, var(--blue), transparent 80%); }
+  .accent.purple { background: linear-gradient(90deg, var(--purple), transparent 80%); }
+  .accent.green  { background: linear-gradient(90deg, var(--green), transparent 80%); }
+  .accent.orange { background: linear-gradient(90deg, var(--orange), transparent 80%); }
+
+  #progress { position:absolute; top:0; left:0; right:0; height:3px; border-radius:20px 20px 0 0; overflow:hidden; z-index:10; }
+  #bar { height:100%; background: linear-gradient(90deg, var(--gold), var(--orange)); transition:width .4s ease; }
+
+  .label { font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .label.gold   { color:var(--gold); }
+  .label.blue   { color:var(--blue); }
+  .label.purple { color:var(--purple); }
+  .label.green  { color:var(--green); }
+  .label.orange { color:var(--orange); }
+
+  h1 { font-size:64px; font-weight:800; line-height:1.05; letter-spacing:-.03em; }
+  h2 { font-size:44px; font-weight:800; line-height:1.08; letter-spacing:-.025em; }
+
+  .grow { flex:1; }
+  .cols { display:flex; gap:24px; flex:1; min-height:0; }
+  .gap  { height:28px; }
+  .gap-sm { height:16px; }
+
+  .stats { display:flex; gap:18px; }
+  .stat {
+    flex:1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .stat:hover { transform:translateY(-4px); box-shadow: 0 8px 30px rgba(78,204,163,.15); }
+  .stat-n { font-size:52px; font-weight:800; line-height:1; letter-spacing:-.03em; }
+  .stat-l { font-size:12px; color:var(--muted); margin-top:8px; text-transform:uppercase; letter-spacing:.06em; }
+
+  .gold  { color:var(--gold); }
+  .blue  { color:var(--blue); }
+  .green { color:var(--green); }
+  .red   { color:var(--red); }
+  .purple{ color:var(--purple); }
+  .orange{ color:var(--orange); }
+
+  .quote {
+    border-left: 3px solid var(--gold);
+    padding: 12px 18px;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--text);
+    background: var(--surface2);
+    border-radius: 0 10px 10px 0;
+  }
+  .quote.purple { border-color:var(--purple); }
+  .quote.green  { border-color:var(--green); }
+
+  .pill {
+    display:inline-block; font-size:12px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 12px; border-radius:20px;
+  }
+  .pill.gold   { background:rgba(245,200,66,.12); color:var(--gold);   border:1px solid rgba(245,200,66,.25); }
+  .pill.blue   { background:rgba(91,156,246,.12); color:var(--blue);   border:1px solid rgba(91,156,246,.25); }
+  .pill.green  { background:rgba(78,204,163,.12); color:var(--green);  border:1px solid rgba(78,204,163,.25); }
+  .pill.purple { background:rgba(167,139,250,.12);color:var(--purple); border:1px solid rgba(167,139,250,.25); }
+  .pill.orange { background:rgba(245,158,66,.12); color:var(--orange); border:1px solid rgba(245,158,66,.25); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover { transform:translateY(-3px); }
+  .card.gold   { border-color:rgba(245,200,66,.2);  background:linear-gradient(135deg,rgba(245,200,66,.06),var(--surface)); }
+  .card.gold:hover { box-shadow: 0 8px 30px rgba(245,200,66,.1); }
+  .card.blue   { border-color:rgba(91,156,246,.2);  background:linear-gradient(135deg,rgba(91,156,246,.06),var(--surface)); }
+  .card.blue:hover { box-shadow: 0 8px 30px rgba(91,156,246,.1); }
+  .card.purple { border-color:rgba(167,139,250,.2); background:linear-gradient(135deg,rgba(167,139,250,.06),var(--surface)); }
+  .card.purple:hover { box-shadow: 0 8px 30px rgba(167,139,250,.1); }
+  .card.green  { border-color:rgba(78,204,163,.2);  background:linear-gradient(135deg,rgba(78,204,163,.06),var(--surface)); }
+  .card.green:hover { box-shadow: 0 8px 30px rgba(78,204,163,.1); }
+  .card.orange { border-color:rgba(245,158,66,.2);  background:linear-gradient(135deg,rgba(245,158,66,.06),var(--surface)); }
+  .card.orange:hover { box-shadow: 0 8px 30px rgba(245,158,66,.1); }
+
+  #nav { margin-top:14px; display:flex; align-items:center; gap:16px; z-index:2; }
+  .btn {
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--muted); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .25s; font-size:15px;
+  }
+  .btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.1); transform:scale(1.1); }
+  .btn:disabled { opacity:.2; cursor:default; }
+  .btn:disabled:hover { border-color:var(--border); color:var(--muted); background:var(--surface); transform:none; }
+  #counter { font-size:13px; color:var(--muted); min-width:56px; text-align:center; }
+  .pips { display:flex; gap:6px; align-items:center; }
+  .pip {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--surface2); border:1px solid rgba(255,255,255,.12);
+    cursor:pointer; transition:all .25s;
+  }
+  .pip:hover { background:rgba(245,200,66,.3); transform:scale(1.3); }
+  .pip.on { background:var(--gold); border-color:var(--gold); width:20px; border-radius:3px; box-shadow: 0 0 8px rgba(245,200,66,.4); }
+
+  .wordmark { font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+  video { border-radius: 12px; background: #000; }
+
+  .slide.active .fade-up {
+    animation: fadeUp .55s cubic-bezier(.4,0,.2,1) both;
+  }
+  .slide.active .fade-up:nth-child(2) { animation-delay:.07s; }
+  .slide.active .fade-up:nth-child(3) { animation-delay:.14s; }
+  .slide.active .fade-up:nth-child(4) { animation-delay:.21s; }
+  .slide.active .fade-up:nth-child(5) { animation-delay:.28s; }
+  .slide.active .fade-up:nth-child(6) { animation-delay:.35s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .slide.active .pop { animation: pop .5s cubic-bezier(.4,0,.2,1) both; }
+  .slide.active .pop:nth-child(2) { animation-delay:.1s; }
+  .slide.active .pop:nth-child(3) { animation-delay:.2s; }
+  @keyframes pop {
+    0%   { transform:scale(.7); opacity:0; }
+    60%  { transform:scale(1.06); }
+    100% { transform:scale(1); opacity:1; }
+  }
+
+  .glow {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(10px);
+    animation: pulse 5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    0%   { opacity:.6; transform:scale(1); }
+    100% { opacity:1;  transform:scale(1.08); }
+  }
+  #s0 .glow1 {
+    width:700px; height:700px; top:-280px; right:-150px;
+    background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);
+  }
+  #s0 .glow2 {
+    width:500px; height:500px; bottom:-200px; left:-100px;
+    background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%);
+    animation-delay: 2s;
+  }
+  #s0 .glow3 {
+    width:300px; height:300px; top:50%; left:40%;
+    background:radial-gradient(circle,rgba(245,158,66,.05) 0%,transparent 70%);
+    animation-delay: 3.5s;
+  }
+  #s0 { justify-content:center; align-items:flex-start; }
+
+  .slide .ambient {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(40px);
+    animation: ambientDrift 8s ease-in-out infinite alternate;
+  }
+  @keyframes ambientDrift {
+    0%   { opacity:.5; transform:translate(0,0) scale(1); }
+    50%  { opacity:.8; transform:translate(15px,-10px) scale(1.05); }
+    100% { opacity:.5; transform:translate(-10px,5px) scale(.95); }
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--orange) 50%, var(--purple) 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="deck">
+  <div id="progress"><div id="bar"></div></div>
+
+  <!-- 0 · TITLE -->
+  <div class="slide active" id="s0">
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
+    <div class="glow glow3"></div>
+    <div class="accent gold"></div>
+    <img src="img/play the alpha.jpg" style="position:absolute;right:0;top:0;bottom:0;height:100%;width:48%;object-fit:cover;object-position:center;border-radius:0 20px 20px 0;opacity:.55;">
+    <div style="position:absolute;right:0;top:0;bottom:0;width:55%;background:linear-gradient(90deg,var(--bg) 0%,transparent 55%);border-radius:0 20px 20px 0;"></div>
+    <div class="label gold fade-up" style="font-size:14px;">Entropedia · Week 4</div>
+    <h1 class="fade-up gradient-text" style="font-size:84px;line-height:1;">Show &amp; Tell</h1>
+    <div style="height:16px"></div>
+    <div class="fade-up" style="font-size:22px;color:var(--muted);max-width:480px;line-height:1.5;">
+      April 20–23, 2026
+    </div>
+    <div class="wordmark" style="position:absolute;top:48px;right:64px;">Supercell</div>
+  </div>
+
+  <!-- 1 · HYPOTHESIS -->
+  <div class="slide" id="s1">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-150px;background:rgba(245,158,66,.08);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(167,139,250,.06);animation-delay:3s;"></div>
+    <div class="accent orange"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:1100px;">
+      <div class="label orange fade-up" style="font-size:14px;">This Week's Hypothesis</div>
+      <div style="height:12px;"></div>
+      <h1 class="fade-up" style="font-size:68px;line-height:1.08;">
+        Reddit is good for <span class="orange">organic growth</span> —<br>
+        but it's <span class="gradient-text">not enough</span>.
+      </h1>
+      <div class="gap"></div>
+      <div class="fade-up" style="font-size:20px;color:var(--muted);line-height:1.6;max-width:780px;">
+        Organic posts brought the first real wave of players. Now we need to see what breaks when we push harder — and fix the funnel underneath.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · REDDIT POSTS GALLERY + STATS -->
+  <div class="slide" id="s2">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.07);"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up">Hypothesis · Reddit · Organic</div>
+    <h2 class="fade-up">Posted Across Multiple Angles</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Tested different hooks and subs to see what resonates. <strong class="orange">~22K combined views, 82 upvotes.</strong></div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div class="fade-up" style="flex:1.2;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);gap:10px;min-height:0;">
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.02.12.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.02.22.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.02.30.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.02.43.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.02.53.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(245,158,66,.1);">
+          <img src="img/reddit posts/Screenshot 2026-04-24 at 02.03.09.png" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        </div>
+      </div>
+      <div class="card orange fade-up" style="flex:1;display:flex;flex-direction:column;gap:8px;padding:20px 22px;">
+        <div style="font-weight:700;font-size:16px;" class="orange">By Subreddit</div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <thead>
+            <tr style="color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;">
+              <th style="text-align:left;padding:8px 0;border-bottom:1px solid var(--border);font-weight:600;">Subreddit</th>
+              <th style="text-align:right;padding:8px 0;border-bottom:1px solid var(--border);font-weight:600;">Upvotes</th>
+              <th style="text-align:right;padding:8px 0;border-bottom:1px solid var(--border);font-weight:600;">Comments</th>
+              <th style="text-align:right;padding:8px 0;border-bottom:1px solid var(--border);font-weight:600;">Views</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:7px 0;color:var(--text);">r/godot</td><td style="text-align:right;color:var(--muted);">4</td><td style="text-align:right;color:var(--muted);">0</td><td style="text-align:right;color:var(--muted);">607</td></tr>
+            <tr><td style="padding:7px 0;color:var(--text);">r/indiegames</td><td style="text-align:right;color:var(--muted);">1</td><td style="text-align:right;color:var(--muted);">1</td><td style="text-align:right;color:var(--muted);">110</td></tr>
+            <tr><td style="padding:7px 0;color:var(--text);">r/IndieDev</td><td style="text-align:right;color:var(--muted);">2</td><td style="text-align:right;color:var(--muted);">2</td><td style="text-align:right;color:var(--muted);">503</td></tr>
+            <tr><td style="padding:7px 0;color:var(--text);">r/aigamedev</td><td style="text-align:right;color:var(--muted);">5</td><td style="text-align:right;color:var(--muted);">0</td><td style="text-align:right;color:var(--muted);">679</td></tr>
+            <tr><td style="padding:7px 0;color:var(--text);">r/accelerate</td><td style="text-align:right;color:var(--muted);">5</td><td style="text-align:right;color:var(--muted);">2</td><td style="text-align:right;color:var(--muted);">2.1K</td></tr>
+            <tr style="background:rgba(245,158,66,.08);">
+              <td style="padding:8px 6px;color:var(--orange);font-weight:700;border-radius:6px 0 0 6px;">r/LocalLLaMA</td>
+              <td style="text-align:right;padding:8px 0;color:var(--orange);font-weight:700;">65</td>
+              <td style="text-align:right;padding:8px 0;color:var(--orange);font-weight:700;">13</td>
+              <td style="text-align:right;padding:8px 6px;color:var(--orange);font-weight:700;border-radius:0 6px 6px 0;">18K</td>
+            </tr>
+            <tr style="border-top:2px solid var(--border);">
+              <td style="padding:10px 0 2px;color:var(--text);font-weight:700;">Sum</td>
+              <td style="text-align:right;padding:10px 0 2px;color:var(--text);font-weight:700;">82</td>
+              <td style="text-align:right;padding:10px 0 2px;color:var(--text);font-weight:700;">18</td>
+              <td style="text-align:right;padding:10px 0 2px;color:var(--text);font-weight:700;">~22K</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · REDDIT ORGANIC LEARNINGS -->
+  <div class="slide" id="s2b">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.08);"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up">Hypothesis · Reddit · Organic</div>
+    <h2 class="fade-up">Organic Hit a Ceiling</h2>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1.1;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+        <div class="card orange fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:19px;" class="orange">Big subs = noise</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Too much competing content. Much more effort per post to differentiate.</div>
+        </div>
+        <div class="card blue fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:19px;" class="blue">Smaller / technical subs = engagement, worse conversion</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Niche audiences interact more, but fewer actually play.</div>
+        </div>
+        <div class="card fade-up" style="gap:10px;display:flex;flex-direction:column;border-color:rgba(240,102,128,.25);background:linear-gradient(135deg,rgba(240,102,128,.06),var(--surface));">
+          <div style="font-weight:700;font-size:19px;" class="red">Account blocked 3×</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Reddit's anti-spam kept suspending the posting account. Unblocked each time, but real friction.</div>
+        </div>
+      </div>
+      <div class="fade-up" style="flex:1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid rgba(240,102,128,.25);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(240,102,128,.15);">
+        <img src="img/reddit account blocked.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · PAID ADS -->
+  <div class="slide" id="s3">
+    <div class="ambient" style="width:400px;height:400px;bottom:-100px;right:-50px;background:rgba(245,158,66,.07);animation-delay:2s;"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up">Hypothesis · Reddit · Paid</div>
+    <h2 class="fade-up">First Paid Ads Experiment</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Tried Reddit's native promoted posts to see what paid acquisition looks like.</div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div class="stats fade-up">
+          <div class="stat pop"><div class="stat-n orange">$50</div><div class="stat-l">Daily Budget</div></div>
+          <div class="stat pop"><div class="stat-n orange">4</div><div class="stat-l">Days Running</div></div>
+          <div class="stat pop"><div class="stat-n orange">$200</div><div class="stat-l">Total Spend</div></div>
+        </div>
+        <div class="card orange fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:18px;" class="orange">Takeaway</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Useful baseline — but Reddit alone probably isn't the channel that unlocks scale.</div>
+        </div>
+      </div>
+      <div class="fade-up" style="flex:1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid rgba(245,158,66,.25);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(245,158,66,.15);">
+        <img src="img/reddit ad.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 · CHANNEL EXPLORATION -->
+  <div class="slide" id="s4">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;left:-100px;background:rgba(91,156,246,.06);"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up">Hypothesis · Reddit</div>
+    <h2 class="fade-up">Scouting Other Channels</h2>
+    <div class="gap-sm"></div>
+    <div style="display:flex;gap:20px;flex:1;min-height:0;">
+      <div class="card fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;border-color:rgba(240,102,128,.2);background:linear-gradient(135deg,rgba(240,102,128,.05),var(--surface));">
+        <span class="pill" style="background:rgba(240,102,128,.12);color:var(--red);border:1px solid rgba(240,102,128,.25);">Heavy</span>
+        <div style="font-weight:700;font-size:20px;" class="red">Facebook / Instagram</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.6;">Account-centric platforms. Need a whole content/brand presence to be worth the spend — big lift for one person.</div>
+      </div>
+      <div class="card blue fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <span class="pill blue">Promising</span>
+        <div style="font-weight:700;font-size:20px;" class="blue">Google / YouTube / Mobile</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.6;">Cheaper intent-based targeting. But need real mobile support first — otherwise paid mobile traffic churns instantly.</div>
+      </div>
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <span class="pill green">Next</span>
+        <div style="font-weight:700;font-size:20px;" class="green">Keep Reddit as baseline</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.6;">Posts + small paid spend stay. Expand once mobile is solid.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4b · POSTHOG DAU -->
+  <div class="slide" id="s4b">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(78,204,163,.07);"></div>
+    <div class="accent green"></div>
+    <div class="label green fade-up">Result · Analytics</div>
+    <h2 class="fade-up">DAU Response to Reddit Push</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Organic + promoted posts moved the needle — but we need more than that.</div>
+    <div class="gap-sm"></div>
+    <div class="fade-up" style="flex:1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(78,204,163,.15);">
+      <img src="img/posthog DAU.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;padding:8px;">
+    </div>
+  </div>
+
+  <!-- 5 · LONG SESSIONS DESPITE BUGS -->
+  <div class="slide" id="s5">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(78,204,163,.07);"></div>
+    <div class="accent green"></div>
+    <div class="label green fade-up">Retention · Signal</div>
+    <h2 class="fade-up">The Ones Who Stayed — Went Deep</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Players who powered through the broken quests and brutal CPU racked up long sessions. The core is sticky — the friction is the problem.</div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+        <div class="card green fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:19px;" class="green">Long sessions from survivors</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Once a player gets past the rough edges, they stay in for extended play — single sessions running 30+ minutes.</div>
+        </div>
+        <div class="card gold fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:19px;" class="gold">Return visits too</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Same users coming back across days — even with CPU that was beating them and quests they couldn't finish.</div>
+        </div>
+        <div class="card orange fade-up" style="gap:10px;display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:19px;" class="orange">Implication</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">The depth is already there. Fix the entry friction (bounce, CPU, quests) and a lot more people make it to the fun.</div>
+        </div>
+      </div>
+      <div class="fade-up" style="flex:1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(78,204,163,.15);">
+        <img src="img/posthog player detail.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;padding:8px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 5b · FUNNEL FIXES -->
+  <div class="slide" id="s5b">
+    <div class="ambient" style="width:400px;height:400px;bottom:-100px;left:-80px;background:rgba(78,204,163,.06);animation-delay:2s;"></div>
+    <div class="accent green"></div>
+    <div class="label green fade-up">Retention · Fixes</div>
+    <h2 class="fade-up">Reduced Friction at the Entry</h2>
+    <div class="gap-sm"></div>
+    <div style="display:flex;gap:18px;flex:1;min-height:0;">
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:28px;">📦</div>
+        <div style="font-weight:700;font-size:17px;" class="green">Smaller Godot build</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">Trimmed build size to cut load time on first visit.</div>
+      </div>
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:28px;">🪄</div>
+        <div style="font-weight:700;font-size:17px;" class="green">Landing page loader</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">Keeps users engaged while the game loads — no more blank wait.</div>
+      </div>
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:28px;">📱</div>
+        <div style="font-weight:700;font-size:17px;" class="green">Mobile UX + PWA</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">Better touch layout, installable from the browser.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 · PAIN POINTS FOR STAYERS -->
+  <div class="slide" id="s6">
+    <div class="ambient" style="width:400px;height:400px;bottom:-100px;left:-80px;background:rgba(78,204,163,.06);animation-delay:1s;"></div>
+    <div class="accent green"></div>
+    <div class="label green fade-up">Retention · Pain Points</div>
+    <h2 class="fade-up">Fixed for the Players Who Stayed</h2>
+    <div class="gap-sm"></div>
+    <div style="display:flex;gap:20px;flex:1;min-height:0;">
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="pill green">Fixed</span>
+          <div style="font-weight:700;font-size:20px;">CPU too hard</div>
+        </div>
+        <div style="font-size:16px;color:var(--muted);line-height:1.6;">New players were bouncing off fights they couldn't win. Nerfed CPU opponents so they're actually beatable — ramp feels fair.</div>
+      </div>
+      <div class="card green fade-up" style="flex:1;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="pill green">Fixed</span>
+          <div style="font-weight:700;font-size:20px;">Crafting quests broken</div>
+        </div>
+        <div style="font-size:16px;color:var(--muted);line-height:1.6;">Several crafting quests were unclearable. Silent churn driver — repaired this week.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 · NEW MODES HEADER -->
+  <div class="slide" id="s7">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-200px;background:rgba(167,139,250,.07);"></div>
+    <div class="accent purple"></div>
+    <div class="label purple fade-up">Hypothesis · Depth</div>
+    <h2 class="fade-up">New Semantic Game Modes</h2>
+    <div class="gap"></div>
+    <div style="display:flex;gap:20px;flex:1;min-height:0;">
+      <div class="card purple fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <span class="pill purple">New</span>
+        <div style="font-weight:700;font-size:20px;">Raid</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.5;">Cooperative PvE. Chain builder + raid player team up on a shared boss.</div>
+      </div>
+      <div class="card blue fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <span class="pill blue">New</span>
+        <div style="font-weight:700;font-size:20px;">Incremental Semantic</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.5;">Rarity escalates round by round. Common → legendary pressure ramp.</div>
+      </div>
+      <div class="card gold fade-up" style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <span class="pill gold">New</span>
+        <div style="font-weight:700;font-size:20px;">Daily Challenge</div>
+        <div style="font-size:15px;color:var(--muted);line-height:1.5;">Craft a mythic card matching today's target. Refreshes every 24h.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 · SOCIAL FEATURES -->
+  <div class="slide" id="s8">
+    <div class="ambient" style="width:400px;height:400px;top:-100px;left:-80px;background:rgba(91,156,246,.06);"></div>
+    <div class="accent blue"></div>
+    <div class="label blue fade-up">Depth · Social</div>
+    <h2 class="fade-up">Rewards That Make Players Show Off</h2>
+    <div class="gap-sm"></div>
+    <div class="fade-up" style="font-size:17px;color:var(--muted);max-width:820px;line-height:1.6;">
+      Light social layer so returning players have something to earn and display.
+    </div>
+    <div class="gap"></div>
+    <div style="display:flex;gap:18px;flex:1;min-height:0;">
+      <div class="card blue fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:24px;">😀</div>
+          <div style="font-weight:700;font-size:17px;" class="blue">Emotes</div>
+        </div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">In-match expression — cheering, taunting, reacting.</div>
+        <div style="flex:1;min-height:0;overflow:hidden;border-radius:10px;margin-top:4px;box-shadow:0 6px 20px rgba(0,0,0,.3);">
+          <video src="img/emoji example.mov" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+        </div>
+      </div>
+      <div class="card purple fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:24px;">🎴</div>
+          <div style="font-weight:700;font-size:17px;" class="purple">Card backsides</div>
+        </div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">Cosmetic card backs players unlock and equip.</div>
+        <div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:6px;margin-top:4px;">
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_01.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_02.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_03.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_04.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_05.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_06.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_07.svg"></div>
+          <div style="overflow:hidden;border-radius:6px;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(91,156,246,.12));border:1px solid rgba(167,139,250,.3);padding:4px;"><img style="width:100%;height:100%;object-fit:contain;display:block;filter:invert(1) brightness(1.1);" src="img/card backside/card_08.svg"></div>
+        </div>
+      </div>
+      <div class="card gold fade-up" style="flex:1;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:24px;">🏆</div>
+          <div style="font-weight:700;font-size:17px;" class="gold">Player titles</div>
+        </div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5;">Earnable tags shown next to names — light status signal.</div>
+        <div style="flex:1;min-height:0;overflow:hidden;border-radius:10px;margin-top:4px;box-shadow:0 6px 20px rgba(0,0,0,.3);">
+          <img src="img/title example.png" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 · GRID + RARITY -->
+  <div class="slide" id="s9">
+    <div class="ambient" style="width:500px;height:500px;bottom:-150px;right:-100px;background:rgba(245,200,66,.06);animation-delay:2s;"></div>
+    <div class="accent gold"></div>
+    <div class="label gold fade-up">Status</div>
+    <h2 class="fade-up">Grid + Rarity Tuning</h2>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div class="card purple fade-up" style="gap:12px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="pill purple">Internal Playtest</span>
+            <div style="font-weight:700;font-size:20px;" class="purple">Grid</div>
+          </div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Played between us this week. Mechanically works — but still lacking <em>something</em>. Needs another design pass before we take it out.</div>
+        </div>
+        <div class="card gold fade-up" style="gap:12px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="pill gold">Shipped</span>
+            <div style="font-weight:700;font-size:20px;" class="gold">Rarity matters more</div>
+          </div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.55;">Updated existing modes to weigh rarity more heavily — player-requested. Legendary plays now feel legendary.</div>
+        </div>
+      </div>
+      <div class="fade-up" style="flex:1.1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(167,139,250,.15);">
+        <img src="img/gridmode.png" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button class="btn" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="pips" id="pips"></div>
+  <div id="counter">1 / 13</div>
+  <button class="btn" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+const cvs = document.getElementById('particles');
+const ctx = cvs.getContext('2d');
+const colors = ['#f5c842','#a78bfa','#5b9cf6','#4ecca3','#f59e42','#f06680'];
+const LINE_DIST = 300;
+const NUM = 25;
+let W, H;
+
+function resize() {
+  W = cvs.width = window.innerWidth;
+  H = cvs.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const pts = [];
+for (let i = 0; i < NUM; i++) {
+  pts.push({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+    size: 3+Math.random()*5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    phase: Math.random()*Math.PI*2,
+    noiseX: Math.random()*1000, noiseY: Math.random()*1000,
+    opacity: .4+Math.random()*.4
+  });
+}
+
+function tick(t) {
+  ctx.clearRect(0,0,W,H);
+  const ts = t*.001;
+
+  for (const p of pts) {
+    p.noiseX += .002; p.noiseY += .002;
+    const wobbleX = Math.sin(ts*.4+p.phase)*0.15 + Math.sin(ts*.7+p.phase*2.3)*0.1;
+    const wobbleY = Math.cos(ts*.35+p.phase*1.7)*0.15 + Math.cos(ts*.6+p.phase*3.1)*0.1;
+    p.x += p.vx + wobbleX;
+    p.y += p.vy + wobbleY;
+    if (p.x<-20) p.x=W+20; if (p.x>W+20) p.x=-20;
+    if (p.y<-20) p.y=H+20; if (p.y>H+20) p.y=-20;
+    p.curOpacity = p.opacity * (.6 + .4*Math.sin(ts*1.2+p.phase));
+  }
+
+  for (let i=0;i<pts.length;i++) {
+    for (let j=i+1;j<pts.length;j++) {
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if (d<LINE_DIST) {
+        const alpha = (1-d/LINE_DIST)*.35;
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = 'rgba(255,255,255,'+alpha+')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (const p of pts) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size/2, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.curOpacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+const slides = document.querySelectorAll('.slide');
+const pips = document.getElementById('pips');
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+const bp = document.getElementById('bp');
+const bn = document.getElementById('bn');
+const N = slides.length;
+let cur = 0;
+
+for (let i = 0; i < N; i++) {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i===0?' on':'');
+  p.onclick = () => goTo(i);
+  pips.appendChild(p);
+}
+
+function goTo(n) {
+  if (n < 0 || n >= N) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  const prev = cur;
+  setTimeout(() => slides[prev].classList.remove('exit'), 500);
+  cur = n;
+  slides[cur].classList.add('active');
+  pips.querySelectorAll('.pip').forEach((p,i) => p.classList.toggle('on', i===cur));
+  counter.textContent = (cur+1)+' / '+N;
+  bar.style.width = ((cur+1)/N*100)+'%';
+  bp.disabled = cur===0;
+  bn.disabled = cur===N-1;
+  slides[prev].querySelectorAll('video').forEach(v => v.pause());
+  slides[cur].querySelectorAll('video').forEach(v => { v.currentTime = 0; v.play(); });
+}
+
+function go(d) { goTo(cur+d); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') go(1);
+  if (e.key==='ArrowLeft') go(-1);
+});
+
+bar.style.width = (1/N*100)+'%';
+</script>
+</body>
+</html>

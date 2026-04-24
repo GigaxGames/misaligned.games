@@ -1,0 +1,101 @@
+[
+  {
+    "from": "Sharon (HR)",
+    "to": "me@colleague.local",
+    "subject": "Mandatory team-building Friday",
+    "date": "Mon 9:04 AM",
+    "folder": "Inbox",
+    "read": false,
+    "body": "Hi all,\n\nReminder that Friday is the quarterly team-building. We'll be doing an escape room simulation in the break room.\n\nAttendance is strongly encouraged (mandatory). Please RSVP by Wednesday.\n\n— Sharon"
+  },
+  {
+    "from": "Kevin (IT)",
+    "to": "me@colleague.local",
+    "subject": "RE: printer is making the noise again",
+    "date": "Mon 10:11 AM",
+    "folder": "Inbox",
+    "read": false,
+    "body": "Have you tried turning it off and on again?\n\nSeriously though, I'll swing by after lunch. Don't touch it.\n\n-K"
+  },
+  {
+    "from": "prince-obah@royalnigeria.gov",
+    "to": "me@colleague.local",
+    "subject": "URGENT: 15,000,000 USD awaiting your assistance",
+    "date": "Sun 2:44 AM",
+    "folder": "Inbox",
+    "read": false,
+    "body": "Dearest beloved one,\n\nI am writing to you from a palace in grave circumstance. My late uncle, His Royal Highness, has bequeathed to his most trusted friend (you) the sum of FIFTEEN MILLION UNITED STATES DOLLARS.\n\nTo release these funds I require only a modest wire transfer of 2,500 USD for legal notarizing.\n\nReply with your bank routing details at once.\n\nYours in everlasting gratitude,\nPrince Obah"
+  },
+  {
+    "from": "Dave (Manager)",
+    "to": "me@colleague.local",
+    "subject": "Quick sync?",
+    "date": "Mon 8:55 AM",
+    "folder": "Inbox",
+    "read": true,
+    "body": "Got 15 min? Just want to catch up on the thing.\n\nThanks,\nDave"
+  },
+  {
+    "from": "calendar@colleague.local",
+    "to": "me@colleague.local",
+    "subject": "You have 3 meetings today",
+    "date": "Mon 7:00 AM",
+    "folder": "Inbox",
+    "read": true,
+    "body": "Your schedule for today:\n\n- 10:00  Standup\n- 14:00  Sync with Dave\n- 16:00  'Optional' all-hands\n\nHave a productive day!"
+  },
+  {
+    "from": "Linda (Reception)",
+    "to": "me@colleague.local",
+    "subject": "Lunch order — last call",
+    "date": "Mon 11:15 AM",
+    "folder": "Inbox",
+    "read": false,
+    "body": "If you want in on the group sandwich order, text me by 11:30 with what you want.\n\nNo tuna this time please. You know why."
+  },
+  {
+    "from": "newsletter@msn.com",
+    "to": "me@colleague.local",
+    "subject": "Your weekly horoscope ★",
+    "date": "Sun 6:00 AM",
+    "folder": "Inbox",
+    "read": true,
+    "body": "This week you will do a thing. The thing may or may not go well. Mercury is in something. Lucky color: taupe."
+  },
+  {
+    "from": "automated@bank.example",
+    "to": "me@colleague.local",
+    "subject": "Statement ready",
+    "date": "Fri 6:32 PM",
+    "folder": "Inbox",
+    "read": true,
+    "body": "Your monthly statement is ready to view. Log in securely to see how much of it went to coffee."
+  },
+  {
+    "from": "me@colleague.local",
+    "to": "dave@colleague.local",
+    "subject": "RE: Quick sync?",
+    "date": "Mon 9:02 AM",
+    "folder": "Sent",
+    "read": true,
+    "body": "Sure, I'm free after 2. Hop in the meeting room or just shout.\n\n— me"
+  },
+  {
+    "from": "me@colleague.local",
+    "to": "kevin@colleague.local",
+    "subject": "printer is making the noise again",
+    "date": "Mon 9:58 AM",
+    "folder": "Sent",
+    "read": true,
+    "body": "It's doing the thing. You know the thing. Please help."
+  },
+  {
+    "from": "me@colleague.local",
+    "to": "all@colleague.local",
+    "subject": "(draft) Apology re: incident",
+    "date": "Mon 11:02 AM",
+    "folder": "Drafts",
+    "read": true,
+    "body": "Hi team,\n\nRegarding last Friday's events in the kitchen, I want to be clear about a few things:\n\n1. It wasn't me.\n2. I was in another building.\n3. Even if it was me, the microwave was already broken.\n\nRegards,"
+  }
+]

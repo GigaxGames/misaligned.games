@@ -1,0 +1,82 @@
+{
+  "name": "C:",
+  "type": "dir",
+  "icon": "💾",
+  "children": [
+    {
+      "name": "Desktop",
+      "type": "dir",
+      "icon": "🖥",
+      "children": [
+        { "name": "readme.txt", "type": "file", "icon": "📄", "content": "Welcome to Call My Colleague · Windows.\n\nThis is a fake OS. Nothing here is real. All your clicks are lies.\n\nTry:\n- Minesweeper (classic 9x9, 10 mines)\n- MSN Messenger (double-click a buddy)\n- The Meeting app, for that true 'am I on mute' feeling\n\nTry not to:\n- reply to the Nigerian prince\n- show up to the HR session unprepared\n- use the microwave (see kitchen)" }
+      ]
+    },
+    {
+      "name": "My Documents",
+      "type": "dir",
+      "icon": "📁",
+      "children": [
+        { "name": "todo.txt", "type": "file", "icon": "📄", "content": "TODO:\n[x] reply to Dave\n[ ] reply to Dave (he replied again)\n[ ] figure out what 'the thing' is\n[ ] RSVP team-building\n[ ] actually RSVP\n[ ] don't panic\n" },
+        { "name": "passwords.txt", "type": "file", "icon": "📄", "content": "(leave blank. nothing to see here.)\n\n\n\n\n\n\n\n\n\n\n\n\n\nok fine:\nbank:  hunter2\nemail: hunter2\nwifi:  hunter2\nmum's maiden name: SmithKevin\n" },
+        { "name": "project-notes.txt", "type": "file", "icon": "📄", "content": "Project NOTES\n\n- The thing with the thing is that the thing depends on another thing.\n- If the other thing moves, this thing moves. Tell Dave. Dave never reads these.\n- Aki suggested splitting into two things. Marco laughed. The laughter was load-bearing.\n\nDecision log:\n- We are not splitting. Yet.\n" },
+        {
+          "name": "Personal",
+          "type": "dir",
+          "icon": "📁",
+          "children": [
+            { "name": "diary.txt", "type": "file", "icon": "📄", "content": "Dear Diary,\n\nToday Dave said 'quick sync?' again. It was not quick.\n\nI wonder what the ceiling looks like.\n" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "My Pictures",
+      "type": "dir",
+      "icon": "🖼",
+      "children": [
+        { "name": "cat.jpg", "type": "file", "icon": "🖼", "content": "(imagine a very good cat)" },
+        { "name": "office-sunset.bmp", "type": "file", "icon": "🖼", "content": "(a sunset, pixelated, over the cubicles)" }
+      ]
+    },
+    {
+      "name": "My Music",
+      "type": "dir",
+      "icon": "🎵",
+      "children": [
+        { "name": "hold-music.mp3", "type": "file", "icon": "🎵", "content": "Imagine tinny jazz." },
+        { "name": "startup-chime.wav", "type": "file", "icon": "🎵", "content": "Ding." }
+      ]
+    },
+    {
+      "name": "Program Files",
+      "type": "dir",
+      "icon": "📁",
+      "children": [
+        { "name": "Minesweeper", "type": "dir", "icon": "📁", "children": [
+          { "name": "minesweep.exe", "type": "file", "icon": "⚙", "content": "(use the desktop shortcut)" }
+        ]},
+        { "name": "MSN Messenger", "type": "dir", "icon": "📁", "children": [
+          { "name": "msmsgs.exe", "type": "file", "icon": "⚙", "content": "(use the desktop shortcut)" }
+        ]}
+      ]
+    },
+    {
+      "name": "Windows",
+      "type": "dir",
+      "icon": "📁",
+      "children": [
+        { "name": "System32", "type": "dir", "icon": "📁", "children": [
+          { "name": "do-not-delete.ini", "type": "file", "icon": "📄", "content": "[system]\nplease=dont\nseriously=no\n" }
+        ]}
+      ]
+    },
+    {
+      "name": "Recycle Bin",
+      "type": "dir",
+      "icon": "🗑",
+      "children": [
+        { "name": "old-draft.txt", "type": "file", "icon": "📄", "content": "Hi team, I quit. Effective immediately. (draft — do not send)" }
+      ]
+    }
+  ]
+}
