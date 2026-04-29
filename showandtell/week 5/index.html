@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropedia — Show & Tell Week 5</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c842;
+    --blue: #5b9cf6;
+    --green: #4ecca3;
+    --red: #f06680;
+    --purple: #a78bfa;
+    --orange: #f59e42;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #05050d;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    height: 100vh; width: 100vw;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; user-select: none;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background: rgba(5,5,13,.82);
+    z-index:0;
+  }
+
+  #particles {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+
+  #deck { position:relative; width:96vw; height:88vh; max-width:1600px; max-height:900px; z-index:1; }
+
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 64px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateX(60px) scale(.97);
+    transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  }
+  .slide.active   { opacity:1; pointer-events:all; transform:translateX(0) scale(1); }
+  .slide.exit     { opacity:0; transform:translateX(-60px) scale(.97); pointer-events:none; }
+
+  .accent {
+    position: absolute; top:0; left:64px; right:64px; height:3px;
+    border-radius: 0 0 3px 3px;
+  }
+  .accent.gold   { background: linear-gradient(90deg, var(--gold), transparent 80%); }
+  .accent.blue   { background: linear-gradient(90deg, var(--blue), transparent 80%); }
+  .accent.purple { background: linear-gradient(90deg, var(--purple), transparent 80%); }
+  .accent.green  { background: linear-gradient(90deg, var(--green), transparent 80%); }
+  .accent.orange { background: linear-gradient(90deg, var(--orange), transparent 80%); }
+  .accent.red    { background: linear-gradient(90deg, var(--red), transparent 80%); }
+
+  #progress { position:absolute; top:0; left:0; right:0; height:3px; border-radius:20px 20px 0 0; overflow:hidden; z-index:10; }
+  #bar { height:100%; background: linear-gradient(90deg, var(--gold), var(--orange)); transition:width .4s ease; }
+
+  .label { font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .label.gold   { color:var(--gold); }
+  .label.blue   { color:var(--blue); }
+  .label.purple { color:var(--purple); }
+  .label.green  { color:var(--green); }
+  .label.orange { color:var(--orange); }
+  .label.red    { color:var(--red); }
+
+  h1 { font-size:64px; font-weight:800; line-height:1.05; letter-spacing:-.03em; }
+  h2 { font-size:44px; font-weight:800; line-height:1.08; letter-spacing:-.025em; }
+
+  .grow { flex:1; }
+  .cols { display:flex; gap:24px; flex:1; min-height:0; }
+  .gap  { height:28px; }
+  .gap-sm { height:16px; }
+
+  .stats { display:flex; gap:18px; }
+  .stat {
+    flex:1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .stat:hover { transform:translateY(-4px); box-shadow: 0 8px 30px rgba(78,204,163,.15); }
+  .stat-n { font-size:52px; font-weight:800; line-height:1; letter-spacing:-.03em; }
+  .stat-l { font-size:12px; color:var(--muted); margin-top:8px; text-transform:uppercase; letter-spacing:.06em; }
+
+  .gold  { color:var(--gold); }
+  .blue  { color:var(--blue); }
+  .green { color:var(--green); }
+  .red   { color:var(--red); }
+  .purple{ color:var(--purple); }
+  .orange{ color:var(--orange); }
+
+  .pill {
+    display:inline-block; font-size:12px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 12px; border-radius:20px;
+  }
+  .pill.gold   { background:rgba(245,200,66,.12); color:var(--gold);   border:1px solid rgba(245,200,66,.25); }
+  .pill.blue   { background:rgba(91,156,246,.12); color:var(--blue);   border:1px solid rgba(91,156,246,.25); }
+  .pill.green  { background:rgba(78,204,163,.12); color:var(--green);  border:1px solid rgba(78,204,163,.25); }
+  .pill.purple { background:rgba(167,139,250,.12);color:var(--purple); border:1px solid rgba(167,139,250,.25); }
+  .pill.orange { background:rgba(245,158,66,.12); color:var(--orange); border:1px solid rgba(245,158,66,.25); }
+  .pill.red    { background:rgba(240,102,128,.12);color:var(--red);    border:1px solid rgba(240,102,128,.25); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover { transform:translateY(-3px); }
+  .card.gold   { border-color:rgba(245,200,66,.2);  background:linear-gradient(135deg,rgba(245,200,66,.06),var(--surface)); }
+  .card.gold:hover { box-shadow: 0 8px 30px rgba(245,200,66,.1); }
+  .card.blue   { border-color:rgba(91,156,246,.2);  background:linear-gradient(135deg,rgba(91,156,246,.06),var(--surface)); }
+  .card.blue:hover { box-shadow: 0 8px 30px rgba(91,156,246,.1); }
+  .card.purple { border-color:rgba(167,139,250,.2); background:linear-gradient(135deg,rgba(167,139,250,.06),var(--surface)); }
+  .card.purple:hover { box-shadow: 0 8px 30px rgba(167,139,250,.1); }
+  .card.green  { border-color:rgba(78,204,163,.2);  background:linear-gradient(135deg,rgba(78,204,163,.06),var(--surface)); }
+  .card.green:hover { box-shadow: 0 8px 30px rgba(78,204,163,.1); }
+  .card.orange { border-color:rgba(245,158,66,.2);  background:linear-gradient(135deg,rgba(245,158,66,.06),var(--surface)); }
+  .card.orange:hover { box-shadow: 0 8px 30px rgba(245,158,66,.1); }
+  .card.red    { border-color:rgba(240,102,128,.2); background:linear-gradient(135deg,rgba(240,102,128,.06),var(--surface)); }
+  .card.red:hover { box-shadow: 0 8px 30px rgba(240,102,128,.1); }
+
+  #nav { margin-top:14px; display:flex; align-items:center; gap:16px; z-index:2; }
+  .btn {
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--muted); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .25s; font-size:15px;
+  }
+  .btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.1); transform:scale(1.1); }
+  .btn:disabled { opacity:.2; cursor:default; }
+  .btn:disabled:hover { border-color:var(--border); color:var(--muted); background:var(--surface); transform:none; }
+  #counter { font-size:13px; color:var(--muted); min-width:56px; text-align:center; }
+  .pips { display:flex; gap:6px; align-items:center; }
+  .pip {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--surface2); border:1px solid rgba(255,255,255,.12);
+    cursor:pointer; transition:all .25s;
+  }
+  .pip:hover { background:rgba(245,200,66,.3); transform:scale(1.3); }
+  .pip.on { background:var(--gold); border-color:var(--gold); width:20px; border-radius:3px; box-shadow: 0 0 8px rgba(245,200,66,.4); }
+
+  .wordmark { font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+  .slide.active .fade-up {
+    animation: fadeUp .55s cubic-bezier(.4,0,.2,1) both;
+  }
+  .slide.active .fade-up:nth-child(2) { animation-delay:.07s; }
+  .slide.active .fade-up:nth-child(3) { animation-delay:.14s; }
+  .slide.active .fade-up:nth-child(4) { animation-delay:.21s; }
+  .slide.active .fade-up:nth-child(5) { animation-delay:.28s; }
+  .slide.active .fade-up:nth-child(6) { animation-delay:.35s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .slide.active .pop { animation: pop .5s cubic-bezier(.4,0,.2,1) both; }
+  .slide.active .pop:nth-child(2) { animation-delay:.1s; }
+  .slide.active .pop:nth-child(3) { animation-delay:.2s; }
+  @keyframes pop {
+    0%   { transform:scale(.7); opacity:0; }
+    60%  { transform:scale(1.06); }
+    100% { transform:scale(1); opacity:1; }
+  }
+
+  .glow {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(10px);
+    animation: pulse 5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    0%   { opacity:.6; transform:scale(1); }
+    100% { opacity:1;  transform:scale(1.08); }
+  }
+  #s0 .glow1 {
+    width:700px; height:700px; top:-280px; right:-150px;
+    background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);
+  }
+  #s0 .glow2 {
+    width:500px; height:500px; bottom:-200px; left:-100px;
+    background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%);
+    animation-delay: 2s;
+  }
+  #s0 .glow3 {
+    width:300px; height:300px; top:50%; left:40%;
+    background:radial-gradient(circle,rgba(245,158,66,.05) 0%,transparent 70%);
+    animation-delay: 3.5s;
+  }
+  #s0 { justify-content:center; align-items:flex-start; }
+
+  .slide .ambient {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(40px);
+    animation: ambientDrift 8s ease-in-out infinite alternate;
+  }
+  @keyframes ambientDrift {
+    0%   { opacity:.5; transform:translate(0,0) scale(1); }
+    50%  { opacity:.8; transform:translate(15px,-10px) scale(1.05); }
+    100% { opacity:.5; transform:translate(-10px,5px) scale(.95); }
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--orange) 50%, var(--purple) 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .flag {
+    display:inline-block; transform:translateY(-2px);
+    animation: flagWave 1.4s ease-in-out infinite;
+  }
+  @keyframes flagWave {
+    0%, 100% { transform: translateY(-2px) rotate(-6deg); }
+    50%      { transform: translateY(-4px) rotate(6deg); }
+  }
+
+  .arrow-down {
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .big-num {
+    font-size: 92px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="deck">
+  <div id="progress"><div id="bar"></div></div>
+
+  <!-- 0 · TITLE -->
+  <div class="slide active" id="s0">
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
+    <div class="glow glow3"></div>
+    <div class="accent gold"></div>
+    <div class="label gold fade-up" style="font-size:14px;">Entropedia · Week 5</div>
+    <h1 class="fade-up gradient-text" style="font-size:84px;line-height:1;">Show &amp; Tell</h1>
+    <div style="height:16px"></div>
+    <div class="fade-up" style="font-size:22px;color:var(--muted);max-width:560px;line-height:1.5;">
+      April 24–30, 2026
+    </div>
+    <div class="wordmark" style="position:absolute;top:48px;right:64px;">Supercell</div>
+  </div>
+
+  <!-- 1 · HYPOTHESIS -->
+  <div class="slide" id="s1">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-150px;background:rgba(245,158,66,.08);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(167,139,250,.06);animation-delay:3s;"></div>
+    <div class="accent orange"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:1100px;">
+      <div class="label orange fade-up" style="font-size:14px;">This Week's Hypothesis</div>
+      <div style="height:12px;"></div>
+      <h1 class="fade-up" style="font-size:68px;line-height:1.08;">
+        Reddit ads can bring us<br>
+        <span class="gradient-text">"addicted", retentive players.</span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- 2 · THE CAMPAIGNS -->
+  <div class="slide" id="s2">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.07);"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up">Acquisition · Reddit Paid</div>
+    <h2 class="fade-up">Reddit Ad Campaigns</h2>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <!-- LEFT · sample creatives (two stacked) -->
+      <div class="fade-up" style="flex:0 0 auto;width:300px;min-height:0;display:flex;flex-direction:column;gap:10px;align-self:flex-start;">
+        <div style="font-size:12px;color:var(--orange);font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Sample creatives</div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(245,158,66,.3);background:#fff;display:block;box-shadow:0 6px 18px rgba(245,158,66,.18);">
+          <img alt="Sample Reddit ad: 'It took me 10 tries to craft KRAKEN in this game!'" src="img/reddit-ad-sample.png" style="width:100%;height:auto;display:block;">
+        </div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(245,158,66,.3);background:#fff;display:block;box-shadow:0 6px 18px rgba(245,158,66,.18);">
+          <img alt="Sample Reddit ad: 'There is no limit to what you can create in this game!'" src="img/reddit-ad-sample2.png" style="width:100%;height:auto;display:block;">
+        </div>
+      </div>
+      <!-- RIGHT · dashboard + takeaway text -->
+      <div class="fade-up" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Performance · 4/23 → 4/29</div>
+          <div style="overflow:hidden;border-radius:10px;border:1px solid rgba(245,200,66,.3);background:#0d0d18;display:block;box-shadow:0 12px 40px rgba(245,200,66,.15);">
+            <img alt="Reddit ad metrics: spend, impressions, clicks, eCPM, CPC, CTR over the campaign period" src="img/ad-metrics.png" style="width:100%;height:auto;display:block;">
+          </div>
+        </div>
+        <div style="font-size:24px;font-weight:800;line-height:1.35;color:var(--text);padding:0 4px;">
+          <span class="gold">€0.12 CPC</span> · <span class="gold">0.4% CTR</span> — paid traffic <em>works.</em> The wall is what happens <strong>after</strong> they land.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · MOBILE KILLED -->
+  <div class="slide" id="s3">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(240,102,128,.07);"></div>
+    <div class="accent red"></div>
+    <div class="label red fade-up">Learning · Mobile</div>
+    <h2 class="fade-up">Mobile Users Are <span class="red">MEGA Bouncy</span></h2>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div class="card red fade-up" style="display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:22px;" class="red">Game breaks on mobile</div>
+        </div>
+        <div class="card red fade-up" style="display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:22px;" class="red">Even fixed, mobile is bouncy</div>
+        </div>
+        <div class="card green fade-up" style="display:flex;flex-direction:column;">
+          <div style="font-weight:700;font-size:22px;" class="green">Decision: kill mobile ads</div>
+        </div>
+      </div>
+      <div style="flex:.9;display:flex;align-items:center;justify-content:center;">
+        <div class="card fade-up" style="text-align:center;padding:36px 28px;border-color:rgba(240,102,128,.25);background:linear-gradient(135deg,rgba(240,102,128,.08),var(--surface));">
+          <div class="big-num red" style="font-size:120px;">~80%</div>
+          <div style="font-size:16px;color:var(--text);margin-top:12px;font-weight:600;">bouncing instantly</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · DAU SPIKE BUT... -->
+  <div class="slide" id="s5">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,200,66,.07);"></div>
+    <div class="accent gold"></div>
+    <div class="label gold fade-up">Result · Acquisition Worked</div>
+    <h2 class="fade-up">DAU Spiked. <span class="red">But…</span></h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Ads brought a real wave of new players to the door.</div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div class="fade-up" style="flex:1.3;min-height:0;overflow:hidden;border-radius:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(245,200,66,.15);">
+        <img alt="Daily Active Users chart over the last 30 days, with a sharp spike on April 29" src="img/dau.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;padding:8px;">
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:18px;justify-content:center;">
+        <div class="card gold fade-up" style="gap:6px;display:flex;flex-direction:column;padding:28px 28px;">
+          <div style="font-size:64px;font-weight:900;line-height:1;letter-spacing:-.03em;" class="gold">DAU peaked</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.5;margin-top:8px;">~500 daily users — multiples of any prior peak.</div>
+        </div>
+        <div class="card red fade-up" style="gap:6px;display:flex;flex-direction:column;padding:28px 28px;">
+          <div style="font-size:48px;font-weight:900;line-height:1.05;letter-spacing:-.025em;" class="red">…they don't<br>stick around.</div>
+          <div style="font-size:15px;color:var(--muted);line-height:1.5;margin-top:8px;">Acquisition works. <strong style="color:var(--text);">Retention is the wall.</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5b · PLAYTEST CLOUD -->
+  <div class="slide" id="s5b">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(91,156,246,.07);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(167,139,250,.06);animation-delay:2s;"></div>
+    <div class="accent blue"></div>
+    <div class="label blue fade-up">Retention · Research</div>
+    <h2 class="fade-up">Qualitative Explains the Quantitative</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">Ran 10 sessions on PlaytestCloud. Strangers, full video + audio + transcripts. <strong class="blue">The signal is screaming.</strong></div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+        <div class="stats fade-up">
+          <div class="stat pop" style="border-color:rgba(91,156,246,.3);background:linear-gradient(135deg,rgba(91,156,246,.08),var(--surface2));">
+            <div class="stat-n blue">10</div>
+            <div class="stat-l">Real players</div>
+          </div>
+          <div class="stat pop" style="border-color:rgba(91,156,246,.3);background:linear-gradient(135deg,rgba(91,156,246,.08),var(--surface2));">
+            <div class="stat-n blue">~5h</div>
+            <div class="stat-l">Recorded</div>
+          </div>
+        </div>
+        <div class="card blue fade-up" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-weight:700;font-size:17px;" class="blue">Diverse panel</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="pill blue">Joseph · 17 · GB</span>
+            <span class="pill blue">Niyah · 19 · US</span>
+            <span class="pill blue">Clarence · 21 · US</span>
+            <span class="pill blue">Kiki · 21 · US</span>
+            <span class="pill blue">Jonathan · 23 · US</span>
+            <span class="pill blue">Iko-ojo · 26 · GB</span>
+            <span class="pill blue">Jean · 29 · GB</span>
+            <span class="pill" style="background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border);">+3 more</span>
+          </div>
+        </div>
+        <div class="card purple fade-up" style="display:flex;flex-direction:column;gap:6px;">
+          <div style="font-weight:800;font-size:20px;" class="purple">Same patterns. Every. Single. Player.</div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.55;">The funnel chart told us <em>where</em>. The playtests tell us <em>why</em> — in their own words.</div>
+        </div>
+      </div>
+      <div class="fade-up" style="flex:1.3;min-width:0;align-self:center;overflow:hidden;border-radius:14px;border:1px solid rgba(91,156,246,.25);display:block;background:#fff;box-shadow:0 12px 40px rgba(91,156,246,.18);">
+        <img alt="PlaytestCloud dashboard showing 7 player recordings of Entropedia from April 29" src="img/playtest-cloud.png" style="width:100%;height:auto;display:block;">
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 · WHERE THEY DROP -->
+  <div class="slide" id="s6">
+    <div class="ambient" style="width:500px;height:500px;bottom:-150px;left:-100px;background:rgba(240,102,128,.06);"></div>
+    <div class="accent red"></div>
+    <div class="label red fade-up">Retention · Voice of Player</div>
+    <h2 class="fade-up">What They're Actually Saying</h2>
+    <div class="fade-up" style="font-size:15px;color:var(--muted);margin-top:6px;">The funnel chart says <strong class="orange">44% craft → 33% combat → 8% won</strong>. Talk to them and you hear why.</div>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div class="fade-up" style="flex:.9;min-height:0;overflow:hidden;border-radius:14px;border:1px solid rgba(240,102,128,.2);display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 12px 40px rgba(240,102,128,.15);">
+        <img alt="PostHog funnel chart showing drop-off from craft to combat to victory" src="img/funnel.png" style="max-width:100%;max-height:100%;object-fit:contain;display:block;padding:12px;">
+      </div>
+      <div style="flex:1.1;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+        <div class="card red fade-up" style="display:flex;gap:14px;align-items:flex-start;padding:18px 20px;">
+          <div style="flex:0 0 auto;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f59e42,#f06680);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(240,102,128,.3);">🏴‍☠️</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-size:18px;line-height:1.4;font-style:italic;color:var(--text);">"The pirate CPU beats me every time."</div>
+            <div style="font-size:13px;color:var(--muted);">— <strong style="color:var(--red);">Joseph</strong>, bounced after combat 2</div>
+          </div>
+        </div>
+        <div class="card orange fade-up" style="display:flex;gap:14px;align-items:flex-start;padding:18px 20px;">
+          <div style="flex:0 0 auto;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#f5c842,#f59e42);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(245,158,66,.3);">😤</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-size:18px;line-height:1.4;font-style:italic;color:var(--text);">"I hate this guy."</div>
+            <div style="font-size:13px;color:var(--muted);">— <strong style="color:var(--orange);">Nicolas</strong>, on the semantic target screen</div>
+          </div>
+        </div>
+        <div class="card purple fade-up" style="display:flex;gap:14px;align-items:flex-start;padding:18px 20px;">
+          <div style="flex:0 0 auto;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#5b9cf6);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(167,139,250,.3);">🪄</div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-size:18px;line-height:1.4;font-style:italic;color:var(--text);">"Wait, why is it not crafting? The cauldron is broken."</div>
+            <div style="font-size:13px;color:var(--muted);">— overheard, repeatedly (it's the mana cap)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 · WALL 1 + SOLUTION -->
+  <div class="slide" id="s7">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.08);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(245,200,66,.07);animation-delay:2s;"></div>
+    <div class="accent gold"></div>
+    <div class="label gold fade-up" style="font-size:13px;"><span class="flag">🚩</span> RADICAL FIX · 1 / 2 <span class="flag" style="animation-delay:.7s;">🚩</span></div>
+    <h2 class="fade-up">No Mana <span style="color:var(--muted);font-weight:400;">→</span> <span class="gold">Endless Mana</span></h2>
+    <div class="gap"></div>
+    <div style="display:flex;gap:36px;flex:1;min-height:0;align-items:stretch;">
+      <!-- LEFT · the wall (problem) -->
+      <div class="fade-up" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;opacity:.85;">
+        <div style="font-size:14px;color:var(--red);font-weight:800;letter-spacing:.18em;text-transform:uppercase;">The Wall</div>
+        <div style="font-size:96px;line-height:1;">🧱</div>
+          <div style="font-size:44px;font-weight:900;line-height:1.15;letter-spacing:-.03em;" class="orange">No mana.<br>They don't come back.</div>
+        <div style="font-size:18px;color:var(--text);font-weight:600;">
+          <strong class="orange" style="font-size:28px;">0</strong> users returned to craft <span style="color:var(--muted);">😢</span>
+        </div>
+      </div>
+      <!-- Divider arrow -->
+      <div class="fade-up" style="display:flex;align-items:center;justify-content:center;">
+        <div style="font-size:80px;line-height:1;font-weight:800;" class="gold">→</div>
+      </div>
+      <!-- RIGHT · the fix (solution) -->
+      <div class="fade-up" style="flex:1.1;display:flex;flex-direction:column;justify-content:center;gap:14px;">
+        <div style="font-size:14px;color:var(--gold);font-weight:800;letter-spacing:.18em;text-transform:uppercase;">The Fix</div>
+        <div style="font-size:140px;line-height:1;font-weight:900;letter-spacing:-.04em;" class="gold">∞</div>
+        <div style="font-size:48px;font-weight:900;line-height:1.05;letter-spacing:-.03em;" class="gold">Endless mana.</div>
+        <div style="font-size:18px;color:var(--text);line-height:1.5;">
+          Just <strong>give it away.</strong> Craft as much as you want, as long as you want.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 · WALL 2 + SOLUTION -->
+  <div class="slide" id="s8" style="flex-direction:row;gap:32px;align-items:stretch;">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-200px;background:rgba(167,139,250,.09);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(240,102,128,.06);animation-delay:2s;"></div>
+    <div class="accent purple"></div>
+
+    <!-- LEFT · all the text content -->
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+      <div class="label purple fade-up" style="font-size:13px;"><span class="flag">🚩</span> RADICAL FIX · 2 / 2 <span class="flag" style="animation-delay:.7s;">🚩</span></div>
+      <h2 class="fade-up">Semantic Too Tough <span style="color:var(--muted);font-weight:400;">→</span> <span class="purple">Raid Mode</span></h2>
+      <div class="gap"></div>
+      <div class="fade-up" style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;">
+        <div>
+          <div style="font-size:14px;color:var(--red);font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;">The Wall</div>
+          <div style="display:flex;align-items:center;gap:14px;opacity:.85;">
+            <div style="font-size:54px;line-height:1;">🧱</div>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="font-size:28px;font-weight:900;line-height:1.1;letter-spacing:-.02em;" class="red">Semantic mode is too tough.</div>
+              <div style="font-size:14px;color:var(--text);">Only <strong class="red">8%</strong> ever win a combat</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:60px;line-height:1;font-weight:800;text-align:left;" class="purple">↓</div>
+        <div>
+          <div style="font-size:14px;color:var(--purple);font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;">The Fix</div>
+          <div style="font-size:42px;font-weight:900;line-height:1.05;letter-spacing:-.03em;" class="purple">Replace with social Raid.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:16px;color:var(--text);">
+          <div style="display:flex;gap:10px;align-items:center;"><span class="purple" style="font-weight:800;font-size:20px;">→</span>Pick a target — raid other players</div>
+          <div style="display:flex;gap:10px;align-items:center;"><span class="purple" style="font-weight:800;font-size:20px;">→</span>Steal cards from their collection</div>
+          <div style="display:flex;gap:10px;align-items:center;"><span class="purple" style="font-weight:800;font-size:20px;">→</span>Lock your best cards to defend</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT · raid screenshots, full slide height -->
+    <div class="fade-up" style="flex:0 0 auto;width:440px;min-height:0;display:grid;grid-template-rows:1fr 1fr 1fr;gap:12px;align-self:stretch;">
+      <div style="overflow:hidden;border-radius:12px;border:1px solid rgba(167,139,250,.3);background:transparent;display:flex;align-items:center;justify-content:center;min-height:0;">
+        <img alt="Raid mode: pick a target screen with CPU opponents" src="img/raid-1-targets.png" style="width:100%;height:100%;object-fit:contain;display:block;">
+      </div>
+      <div style="overflow:hidden;border-radius:12px;border:1px solid rgba(167,139,250,.3);background:transparent;display:flex;align-items:center;justify-content:center;min-height:0;">
+        <img alt="Raid mode: drop a card to steal it from your target" src="img/raid-2-steal.png" style="width:100%;height:100%;object-fit:contain;display:block;">
+      </div>
+      <div style="overflow:hidden;border-radius:12px;border:1px solid rgba(167,139,250,.3);background:transparent;display:flex;align-items:center;justify-content:center;min-height:0;">
+        <img alt="Raid mode: locked card defending against raids" src="img/raid-3-lock.png" style="width:100%;height:100%;object-fit:contain;display:block;">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button class="btn" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="pips" id="pips"></div>
+  <div id="counter">1 / 10</div>
+  <button class="btn" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+const cvs = document.getElementById('particles');
+const ctx = cvs.getContext('2d');
+const colors = ['#f5c842','#a78bfa','#5b9cf6','#4ecca3','#f59e42','#f06680'];
+const LINE_DIST = 300;
+const NUM = 25;
+let W, H;
+
+function resize() {
+  W = cvs.width = window.innerWidth;
+  H = cvs.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const pts = [];
+for (let i = 0; i < NUM; i++) {
+  pts.push({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+    size: 3+Math.random()*5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    phase: Math.random()*Math.PI*2,
+    noiseX: Math.random()*1000, noiseY: Math.random()*1000,
+    opacity: .4+Math.random()*.4
+  });
+}
+
+function tick(t) {
+  ctx.clearRect(0,0,W,H);
+  const ts = t*.001;
+
+  for (const p of pts) {
+    p.noiseX += .002; p.noiseY += .002;
+    const wobbleX = Math.sin(ts*.4+p.phase)*0.15 + Math.sin(ts*.7+p.phase*2.3)*0.1;
+    const wobbleY = Math.cos(ts*.35+p.phase*1.7)*0.15 + Math.cos(ts*.6+p.phase*3.1)*0.1;
+    p.x += p.vx + wobbleX;
+    p.y += p.vy + wobbleY;
+    if (p.x<-20) p.x=W+20; if (p.x>W+20) p.x=-20;
+    if (p.y<-20) p.y=H+20; if (p.y>H+20) p.y=-20;
+    p.curOpacity = p.opacity * (.6 + .4*Math.sin(ts*1.2+p.phase));
+  }
+
+  for (let i=0;i<pts.length;i++) {
+    for (let j=i+1;j<pts.length;j++) {
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if (d<LINE_DIST) {
+        const alpha = (1-d/LINE_DIST)*.35;
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = 'rgba(255,255,255,'+alpha+')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (const p of pts) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size/2, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.curOpacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+const slides = document.querySelectorAll('.slide');
+const pips = document.getElementById('pips');
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+const bp = document.getElementById('bp');
+const bn = document.getElementById('bn');
+const N = slides.length;
+let cur = 0;
+
+for (let i = 0; i < N; i++) {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i===0?' on':'');
+  p.onclick = () => goTo(i);
+  pips.appendChild(p);
+}
+
+function goTo(n) {
+  if (n < 0 || n >= N) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  const prev = cur;
+  setTimeout(() => slides[prev].classList.remove('exit'), 500);
+  cur = n;
+  slides[cur].classList.add('active');
+  pips.querySelectorAll('.pip').forEach((p,i) => p.classList.toggle('on', i===cur));
+  counter.textContent = (cur+1)+' / '+N;
+  bar.style.width = ((cur+1)/N*100)+'%';
+  bp.disabled = cur===0;
+  bn.disabled = cur===N-1;
+  slides[prev].querySelectorAll('video').forEach(v => v.pause());
+  slides[cur].querySelectorAll('video').forEach(v => { v.currentTime = 0; v.play(); });
+}
+
+function go(d) { goTo(cur+d); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') go(1);
+  if (e.key==='ArrowLeft') go(-1);
+});
+
+bar.style.width = (1/N*100)+'%';
+counter.textContent = '1 / '+N;
+</script>
+</body>
+</html>
