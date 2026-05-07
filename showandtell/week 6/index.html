@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entropedia — Show & Tell Week 6</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --border: rgba(255,255,255,0.07);
+    --gold: #f5c842;
+    --blue: #5b9cf6;
+    --green: #4ecca3;
+    --red: #f06680;
+    --purple: #a78bfa;
+    --orange: #f59e42;
+    --text: #e8e8f0;
+    --muted: #7a7a9a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #05050d;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    height: 100vh; width: 100vw;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden; user-select: none;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background: rgba(5,5,13,.82);
+    z-index:0;
+  }
+
+  #particles {
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+
+  #deck { position:relative; width:96vw; height:88vh; max-width:1600px; max-height:900px; z-index:1; }
+
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 64px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateX(60px) scale(.97);
+    transition: opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  }
+  .slide.active   { opacity:1; pointer-events:all; transform:translateX(0) scale(1); }
+  .slide.exit     { opacity:0; transform:translateX(-60px) scale(.97); pointer-events:none; }
+
+  .accent {
+    position: absolute; top:0; left:64px; right:64px; height:3px;
+    border-radius: 0 0 3px 3px;
+  }
+  .accent.gold   { background: linear-gradient(90deg, var(--gold), transparent 80%); }
+  .accent.blue   { background: linear-gradient(90deg, var(--blue), transparent 80%); }
+  .accent.purple { background: linear-gradient(90deg, var(--purple), transparent 80%); }
+  .accent.green  { background: linear-gradient(90deg, var(--green), transparent 80%); }
+  .accent.orange { background: linear-gradient(90deg, var(--orange), transparent 80%); }
+  .accent.red    { background: linear-gradient(90deg, var(--red), transparent 80%); }
+
+  #progress { position:absolute; top:0; left:0; right:0; height:3px; border-radius:20px 20px 0 0; overflow:hidden; z-index:10; }
+  #bar { height:100%; background: linear-gradient(90deg, var(--gold), var(--orange)); transition:width .4s ease; }
+
+  .label { font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .label.gold   { color:var(--gold); }
+  .label.blue   { color:var(--blue); }
+  .label.purple { color:var(--purple); }
+  .label.green  { color:var(--green); }
+  .label.orange { color:var(--orange); }
+  .label.red    { color:var(--red); }
+
+  h1 { font-size:64px; font-weight:800; line-height:1.05; letter-spacing:-.03em; }
+  h2 { font-size:44px; font-weight:800; line-height:1.08; letter-spacing:-.025em; }
+
+  .grow { flex:1; }
+  .cols { display:flex; gap:24px; flex:1; min-height:0; }
+  .gap  { height:28px; }
+  .gap-sm { height:16px; }
+
+  .stats { display:flex; gap:18px; }
+  .stat {
+    flex:1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .stat:hover { transform:translateY(-4px); box-shadow: 0 8px 30px rgba(78,204,163,.15); }
+  .stat-n { font-size:52px; font-weight:800; line-height:1; letter-spacing:-.03em; }
+  .stat-l { font-size:12px; color:var(--muted); margin-top:8px; text-transform:uppercase; letter-spacing:.06em; }
+
+  .gold  { color:var(--gold); }
+  .blue  { color:var(--blue); }
+  .green { color:var(--green); }
+  .red   { color:var(--red); }
+  .purple{ color:var(--purple); }
+  .orange{ color:var(--orange); }
+
+  .pill {
+    display:inline-block; font-size:12px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 12px; border-radius:20px;
+  }
+  .pill.gold   { background:rgba(245,200,66,.12); color:var(--gold);   border:1px solid rgba(245,200,66,.25); }
+  .pill.blue   { background:rgba(91,156,246,.12); color:var(--blue);   border:1px solid rgba(91,156,246,.25); }
+  .pill.green  { background:rgba(78,204,163,.12); color:var(--green);  border:1px solid rgba(78,204,163,.25); }
+  .pill.purple { background:rgba(167,139,250,.12);color:var(--purple); border:1px solid rgba(167,139,250,.25); }
+  .pill.orange { background:rgba(245,158,66,.12); color:var(--orange); border:1px solid rgba(245,158,66,.25); }
+  .pill.red    { background:rgba(240,102,128,.12);color:var(--red);    border:1px solid rgba(240,102,128,.25); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover { transform:translateY(-3px); }
+  .card.gold   { border-color:rgba(245,200,66,.2);  background:linear-gradient(135deg,rgba(245,200,66,.06),var(--surface)); }
+  .card.gold:hover { box-shadow: 0 8px 30px rgba(245,200,66,.1); }
+  .card.blue   { border-color:rgba(91,156,246,.2);  background:linear-gradient(135deg,rgba(91,156,246,.06),var(--surface)); }
+  .card.blue:hover { box-shadow: 0 8px 30px rgba(91,156,246,.1); }
+  .card.purple { border-color:rgba(167,139,250,.2); background:linear-gradient(135deg,rgba(167,139,250,.06),var(--surface)); }
+  .card.purple:hover { box-shadow: 0 8px 30px rgba(167,139,250,.1); }
+  .card.green  { border-color:rgba(78,204,163,.2);  background:linear-gradient(135deg,rgba(78,204,163,.06),var(--surface)); }
+  .card.green:hover { box-shadow: 0 8px 30px rgba(78,204,163,.1); }
+  .card.orange { border-color:rgba(245,158,66,.2);  background:linear-gradient(135deg,rgba(245,158,66,.06),var(--surface)); }
+  .card.orange:hover { box-shadow: 0 8px 30px rgba(245,158,66,.1); }
+  .card.red    { border-color:rgba(240,102,128,.2); background:linear-gradient(135deg,rgba(240,102,128,.06),var(--surface)); }
+  .card.red:hover { box-shadow: 0 8px 30px rgba(240,102,128,.1); }
+
+  #nav { margin-top:14px; display:flex; align-items:center; gap:16px; z-index:2; }
+  .btn {
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface);
+    color:var(--muted); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .25s; font-size:15px;
+  }
+  .btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(245,200,66,.1); transform:scale(1.1); }
+  .btn:disabled { opacity:.2; cursor:default; }
+  .btn:disabled:hover { border-color:var(--border); color:var(--muted); background:var(--surface); transform:none; }
+  #counter { font-size:13px; color:var(--muted); min-width:56px; text-align:center; }
+  .pips { display:flex; gap:6px; align-items:center; }
+  .pip {
+    width:6px; height:6px; border-radius:50%;
+    background:var(--surface2); border:1px solid rgba(255,255,255,.12);
+    cursor:pointer; transition:all .25s;
+  }
+  .pip:hover { background:rgba(245,200,66,.3); transform:scale(1.3); }
+  .pip.on { background:var(--gold); border-color:var(--gold); width:20px; border-radius:3px; box-shadow: 0 0 8px rgba(245,200,66,.4); }
+
+  .wordmark { font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+  .slide.active .fade-up {
+    animation: fadeUp .55s cubic-bezier(.4,0,.2,1) both;
+  }
+  .slide.active .fade-up:nth-child(2) { animation-delay:.07s; }
+  .slide.active .fade-up:nth-child(3) { animation-delay:.14s; }
+  .slide.active .fade-up:nth-child(4) { animation-delay:.21s; }
+  .slide.active .fade-up:nth-child(5) { animation-delay:.28s; }
+  .slide.active .fade-up:nth-child(6) { animation-delay:.35s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .slide.active .pop { animation: pop .5s cubic-bezier(.4,0,.2,1) both; }
+  .slide.active .pop:nth-child(2) { animation-delay:.1s; }
+  .slide.active .pop:nth-child(3) { animation-delay:.2s; }
+  @keyframes pop {
+    0%   { transform:scale(.7); opacity:0; }
+    60%  { transform:scale(1.06); }
+    100% { transform:scale(1); opacity:1; }
+  }
+
+  .glow {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(10px);
+    animation: pulse 5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    0%   { opacity:.6; transform:scale(1); }
+    100% { opacity:1;  transform:scale(1.08); }
+  }
+  #s0 .glow1 {
+    width:700px; height:700px; top:-280px; right:-150px;
+    background:radial-gradient(circle,rgba(245,200,66,.1) 0%,transparent 70%);
+  }
+  #s0 .glow2 {
+    width:500px; height:500px; bottom:-200px; left:-100px;
+    background:radial-gradient(circle,rgba(167,139,250,.07) 0%,transparent 70%);
+    animation-delay: 2s;
+  }
+  #s0 .glow3 {
+    width:300px; height:300px; top:50%; left:40%;
+    background:radial-gradient(circle,rgba(245,158,66,.05) 0%,transparent 70%);
+    animation-delay: 3.5s;
+  }
+  #s0 { justify-content:center; align-items:flex-start; }
+
+  .slide .ambient {
+    position:absolute; border-radius:50%; pointer-events:none;
+    filter: blur(40px);
+    animation: ambientDrift 8s ease-in-out infinite alternate;
+  }
+  @keyframes ambientDrift {
+    0%   { opacity:.5; transform:translate(0,0) scale(1); }
+    50%  { opacity:.8; transform:translate(15px,-10px) scale(1.05); }
+    100% { opacity:.5; transform:translate(-10px,5px) scale(.95); }
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--orange) 50%, var(--purple) 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+  }
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .skull {
+    display:inline-block;
+    animation: skullPulse 2s ease-in-out infinite;
+  }
+  @keyframes skullPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.1) rotate(-5deg); }
+  }
+
+  .arrow-flow {
+    display:flex; align-items:center; gap:16px;
+    font-size:22px; font-weight:700;
+  }
+  .arrow-flow .arr {
+    color: var(--muted);
+    font-size:28px;
+    font-weight:800;
+  }
+
+  .video-frame {
+    overflow:hidden; border-radius:14px;
+    border: 1px solid var(--border);
+    background: #000;
+    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+  }
+  .video-frame video {
+    width:100%; height:100%; object-fit:contain; display:block;
+  }
+
+  .timeline {
+    display:flex; align-items:stretch; gap:0; flex:1; min-height:0;
+  }
+  .timeline-step {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px 16px; position:relative;
+  }
+  .timeline-step::after {
+    content:''; position:absolute; top:50%; right:0;
+    width:48px; height:2px;
+    background:var(--border);
+    transform:translateX(50%);
+  }
+  .timeline-step:last-child::after { display:none; }
+
+  .big-num {
+    font-size: 92px;
+    font-weight: 900;
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+
+  .synergy-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 20px; border-radius:12px;
+    background:linear-gradient(135deg,rgba(78,204,163,.12),rgba(91,156,246,.08));
+    border:1px solid rgba(78,204,163,.3);
+    font-size:18px; font-weight:700;
+    color:var(--green);
+    box-shadow: 0 4px 20px rgba(78,204,163,.15);
+    animation: synergyGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes synergyGlow {
+    0%   { box-shadow: 0 4px 20px rgba(78,204,163,.15); }
+    100% { box-shadow: 0 6px 30px rgba(78,204,163,.3); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="deck">
+  <div id="progress"><div id="bar"></div></div>
+
+  <!-- 0 · TITLE -->
+  <div class="slide active" id="s0">
+    <div class="glow glow1"></div>
+    <div class="glow glow2"></div>
+    <div class="glow glow3"></div>
+    <div class="accent gold"></div>
+    <div class="label gold fade-up" style="font-size:14px;">Entropedia · Week 6</div>
+    <h1 class="fade-up gradient-text" style="font-size:84px;line-height:1;">Show &amp; Tell</h1>
+    <div style="height:16px"></div>
+    <div class="fade-up" style="font-size:22px;color:var(--muted);max-width:560px;line-height:1.5;">
+      April 30 – May 7, 2026
+    </div>
+    <div class="wordmark" style="position:absolute;top:48px;right:64px;">Supercell</div>
+  </div>
+
+  <!-- 1 · THE PROBLEM WE TRIED TO SOLVE -->
+  <div class="slide" id="s1">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-150px;background:rgba(245,158,66,.08);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(167,139,250,.06);animation-delay:3s;"></div>
+    <div class="accent orange"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-width:1100px;">
+      <div class="label orange fade-up" style="font-size:14px;">Context · Grid Experiments</div>
+      <div style="height:12px;"></div>
+      <h1 class="fade-up" style="font-size:60px;line-height:1.08;">
+        We're losing our<br>
+        <span class="gradient-text">mid-core / core players.</span>
+      </h1>
+      <div style="height:24px;"></div>
+      <div class="fade-up" style="font-size:20px;color:var(--muted);line-height:1.6;max-width:800px;">
+        Past users who play autobattlers, core mobile games, Hearthstone…<br>
+        they churn fast. The crafting loop alone doesn't hook them.
+      </div>
+      <div style="height:24px;"></div>
+      <div class="fade-up" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <span class="pill orange">Autobattler fans</span>
+        <span class="pill purple">Hearthstone players</span>
+        <span class="pill blue">Core mobile gamers</span>
+        <span class="pill gold">Mid-core audience</span>
+      </div>
+      <div style="height:32px;"></div>
+      <div class="fade-up" style="font-size:24px;font-weight:800;color:var(--text);line-height:1.4;">
+        Goal: <span class="orange">reduce churn</span> by giving them
+        mechanics that feel <em>sweaty</em>.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · THE APPROACH -->
+  <div class="slide" id="s2">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(167,139,250,.07);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(245,200,66,.06);animation-delay:2s;"></div>
+    <div class="accent purple"></div>
+    <div class="label purple fade-up">Approach</div>
+    <h2 class="fade-up">From <span class="gold">"Family Feud"</span> to <span class="purple">"Semantic Hearthstone"</span></h2>
+    <div class="gap"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:20px;justify-content:center;">
+        <div class="card gold fade-up" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-weight:700;font-size:20px;" class="gold">What people already love</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.55;">In playtests, the <strong style="color:var(--text);">semantic features</strong> — crafting unexpected combos, seeing surprising connections — always score highest.</div>
+        </div>
+        <div class="fade-up" style="display:flex;align-items:center;justify-content:center;">
+          <div style="font-size:60px;line-height:1;font-weight:800;" class="purple">↓</div>
+        </div>
+        <div class="card purple fade-up" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-weight:700;font-size:20px;" class="purple">Make it competitive</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.55;">Leverage those same semantic features but add <strong style="color:var(--text);">depth, strategy, and stakes</strong>. Turn the vibes into a game you can get sweaty about.</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:24px;justify-content:center;align-items:center;">
+        <div class="fade-up" style="text-align:center;">
+          <div style="font-size:72px;line-height:1;">🎉</div>
+          <div style="font-size:16px;color:var(--muted);margin-top:8px;">Casual, party-game vibes</div>
+          <div style="font-size:28px;font-weight:900;margin-top:4px;" class="gold">"Family Feud"</div>
+        </div>
+        <div class="fade-up" style="font-size:48px;line-height:1;font-weight:800;color:var(--muted);">→</div>
+        <div class="fade-up" style="text-align:center;">
+          <div style="font-size:72px;line-height:1;">⚔️</div>
+          <div style="font-size:16px;color:var(--muted);margin-top:8px;">Strategic, sweaty depth</div>
+          <div style="font-size:28px;font-weight:900;margin-top:4px;" class="purple">"Semantic Hearthstone"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · GRID V1 — SCREENSHOT -->
+  <div class="slide" id="s3" style="padding:32px;">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.07);"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up" style="font-size:14px;margin-left:32px;"><span class="pill orange" style="font-size:11px;">Experiment 1</span>&nbsp; Grid v1</div>
+    <div class="fade-up" style="flex:1;min-height:0;overflow:hidden;border-radius:14px;border:1px solid rgba(245,158,66,.25);box-shadow:0 12px 40px rgba(245,158,66,.15);">
+      <img alt="Grid v1: autobattler with cards on a spatial grid" src="img/grid-v1.png" style="width:100%;height:100%;object-fit:contain;display:block;background:#0a0a12;">
+    </div>
+  </div>
+
+  <!-- 3b · GRID V1 — WHAT + FEEDBACK -->
+  <div class="slide" id="s3b">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(245,158,66,.07);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(240,102,128,.06);animation-delay:2s;"></div>
+    <div class="accent orange"></div>
+    <div class="label orange fade-up" style="font-size:14px;">Grid v1</div>
+    <h2 class="fade-up" style="font-size:48px;">Synergies + Deckbuilder + <span class="orange">2D Autobattler</span></h2>
+    <div class="gap"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:18px;justify-content:center;">
+        <div class="card orange fade-up" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-weight:800;font-size:24px;" class="orange">What's in the box</div>
+          <div style="font-size:20px;color:var(--text);line-height:1.6;">
+            <div style="margin-bottom:8px;">Synergies &amp; deckbuilding</div>
+            <div style="margin-bottom:8px;">Special FX for each card</div>
+            <div>2D autobattler grid with rotations</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:18px;justify-content:center;">
+        <div class="card red fade-up" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-weight:800;font-size:24px;" class="red">Feedback</div>
+          <div style="font-size:20px;color:var(--text);line-height:1.6;">
+            <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">
+              <span class="red" style="font-weight:800;font-size:22px;">×</span>
+              <span><strong>"Too much cognitive load"</strong></span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">
+              <span class="red" style="font-weight:800;font-size:22px;">×</span>
+              <span><strong>"Time to fun is very slow"</strong> — 20+ min</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span class="red" style="font-weight:800;font-size:22px;">×</span>
+              <span><strong>"UX very crowded"</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3c · V1 → V2 TRANSITION -->
+  <div class="slide" id="s3c">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;left:-100px;background:rgba(245,158,66,.06);"></div>
+    <div class="ambient" style="width:500px;height:500px;bottom:-150px;right:-100px;background:rgba(78,204,163,.06);animation-delay:2s;"></div>
+    <div class="accent gold"></div>
+    <div style="flex:1;display:flex;align-items:center;gap:0;">
+      <!-- V1 side -->
+      <div class="fade-up" style="flex:1;display:flex;flex-direction:column;gap:16px;opacity:.7;">
+        <div class="pill orange" style="align-self:flex-start;font-size:14px;padding:8px 16px;">Grid v1</div>
+        <div style="font-size:30px;font-weight:800;line-height:1.3;color:var(--text);">
+          Synergies &amp; deckbuilder<br>
+          + Special FX<br>
+          + <span class="red" style="text-decoration:line-through;">2D autobattler grid &amp; rotations</span>
+        </div>
+      </div>
+      <!-- Arrow -->
+      <div class="fade-up" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;padding:0 48px;">
+        <div style="font-size:96px;line-height:1;font-weight:800;" class="gold">→</div>
+        <div style="font-size:20px;font-weight:700;color:var(--muted);text-align:center;max-width:220px;line-height:1.4;">Slash the autobattler.<br>Reduce to <strong class="gold" style="font-size:24px;">3×2 slots</strong>.</div>
+      </div>
+      <!-- V2 side -->
+      <div class="fade-up" style="flex:1;display:flex;flex-direction:column;gap:16px;align-items:flex-end;text-align:right;">
+        <div class="pill green" style="font-size:14px;padding:8px 16px;">Grid v2</div>
+        <div style="font-size:30px;font-weight:800;line-height:1.3;color:var(--text);">
+          Synergies &amp; deckbuilder<br>
+          + Special FX
+        </div>
+        <div style="font-size:20px;color:var(--muted);line-height:1.5;margin-top:4px;">
+          Polished UI.<br>
+          Synergies made more obvious.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 · GRID V2 — VIDEO FULLSCREEN -->
+  <div class="slide" id="s4" style="padding:32px;">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-200px;background:rgba(78,204,163,.08);"></div>
+    <div class="accent green"></div>
+    <div class="label green fade-up" style="font-size:14px;margin-left:32px;"><span class="pill green" style="font-size:11px;">Experiment 2</span>&nbsp; Grid v2</div>
+    <div class="fade-up" style="flex:1;min-height:0;">
+      <div class="video-frame" style="height:100%;">
+        <video src="img/grid-v2.mp4" muted playsinline loop style="width:100%;height:100%;object-fit:contain;"></video>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4b · GRID V2 — FEEDBACK -->
+  <div class="slide" id="s4b">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(240,102,128,.07);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(78,204,163,.06);animation-delay:2s;"></div>
+    <div class="accent blue"></div>
+    <div class="label blue fade-up" style="font-size:14px;">Grid v2 · In-Person Playtests with Core Players</div>
+    <h2 class="fade-up" style="font-size:44px;">What they <span class="red">actually said</span></h2>
+    <div class="gap-sm"></div>
+    <div class="cols">
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+        <div class="card red fade-up" style="display:flex;gap:16px;align-items:center;padding:22px 24px;">
+          <div style="font-size:28px;">😵‍💫</div>
+          <div style="font-size:20px;line-height:1.4;font-style:italic;color:var(--text);">"It's a lot of work to read all this."</div>
+        </div>
+        <div class="card red fade-up" style="display:flex;gap:16px;align-items:center;padding:22px 24px;">
+          <div style="font-size:28px;">😤</div>
+          <div style="font-size:20px;line-height:1.4;font-style:italic;color:var(--text);">"The UX is confusing."</div>
+        </div>
+        <div class="card orange fade-up" style="display:flex;gap:16px;align-items:center;padding:22px 24px;">
+          <div style="font-size:28px;">🧩</div>
+          <div style="font-size:20px;line-height:1.4;font-style:italic;color:var(--text);">"I would have liked having an onboarding, this is complex."</div>
+        </div>
+        <div class="card orange fade-up" style="display:flex;gap:16px;align-items:center;padding:22px 24px;">
+          <div style="font-size:28px;">😮‍💨</div>
+          <div style="font-size:20px;line-height:1.4;font-style:italic;color:var(--text);">"OK now I understand, this was tough to get."</div>
+        </div>
+      </div>
+      <div style="flex:0.6;display:flex;flex-direction:column;gap:14px;justify-content:flex-end;">
+        <div class="fade-up" style="font-size:14px;color:var(--muted);font-style:italic;text-align:right;">"My spaceship is <span class="green" style="font-weight:700;">giga boosted</span> by the fuel next to it!"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · STILL... THE PROBLEMS -->
+  <div class="slide" id="s5">
+    <div class="ambient" style="width:500px;height:500px;top:-150px;right:-100px;background:rgba(240,102,128,.07);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(245,158,66,.06);animation-delay:2s;"></div>
+    <div class="accent red"></div>
+    <div class="label red fade-up">Reality Check</div>
+    <h2 class="fade-up">Still… <span class="red">Three Blockers.</span></h2>
+    <div class="gap"></div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:20px;justify-content:center;max-width:1100px;">
+      <div class="card red fade-up" style="display:flex;gap:20px;align-items:center;padding:28px 32px;">
+        <div style="flex:0 0 auto;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(240,102,128,.2),rgba(245,158,66,.15));display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 14px rgba(240,102,128,.2);">🧠</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:24px;font-weight:800;line-height:1.2;" class="red">High cognitive load</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.5;">Every player mentioned they would have enjoyed onboarding. Too much to figure out on your own — the "what do I do?" problem.</div>
+        </div>
+        <div class="pill red" style="flex:0 0 auto;font-size:14px;padding:8px 16px;">A</div>
+      </div>
+      <div class="card orange fade-up" style="display:flex;gap:20px;align-items:center;padding:28px 32px;">
+        <div style="flex:0 0 auto;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(245,158,66,.2),rgba(245,200,66,.15));display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 14px rgba(245,158,66,.2);">🔧</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:24px;font-weight:800;line-height:1.2;" class="orange">Massive polish gap</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.5;">Lots of work still required to smooth things out. Balancing, UX flows, visual feedback — not close to shippable.</div>
+        </div>
+        <div class="pill orange" style="flex:0 0 auto;font-size:14px;padding:8px 16px;">B</div>
+      </div>
+      <div class="card purple fade-up" style="display:flex;gap:20px;align-items:center;padding:28px 32px;">
+        <div style="flex:0 0 auto;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(167,139,250,.2),rgba(91,156,246,.15));display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 14px rgba(167,139,250,.2);">🎯</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:24px;font-weight:800;line-height:1.2;" class="purple">Audience mismatch?</div>
+          <div style="font-size:16px;color:var(--muted);line-height:1.5;">No proof these mid-core/core users match our larger, more casual crafting user base. Could be building for a niche that doesn't overlap.</div>
+        </div>
+        <div class="pill purple" style="flex:0 0 auto;font-size:14px;padding:8px 16px;">C</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 · THE DECISION -->
+  <div class="slide" id="s6">
+    <div class="ambient" style="width:600px;height:600px;top:-200px;right:-150px;background:rgba(240,102,128,.09);"></div>
+    <div class="ambient" style="width:400px;height:400px;bottom:-120px;left:-80px;background:rgba(245,200,66,.06);animation-delay:3s;"></div>
+    <div class="accent red"></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:28px;">
+      <div class="label red fade-up" style="font-size:14px;">Decision</div>
+      <div class="fade-up" style="font-size:100px;line-height:1;">
+        <span class="skull">💀</span>
+      </div>
+      <h1 class="fade-up" style="font-size:72px;line-height:1.05;">
+        <span class="red">Kill the darling.</span>
+      </h1>
+      <div class="fade-up" style="font-size:20px;color:var(--muted);max-width:700px;line-height:1.6;">
+        Grid experiments are <strong style="color:var(--text);">discontinued</strong>. The synergy moment was real — but the path to get there is too long, too costly, and aimed at a user base we haven't proven we can serve.
+      </div>
+      <div class="gap-sm"></div>
+      <div class="card gold fade-up" style="max-width:750px;display:flex;flex-direction:column;gap:12px;text-align:left;padding:28px 32px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:28px;">🎯</span>
+          <div style="font-weight:800;font-size:22px;" class="gold">Refocus on the casual crafting experience.</div>
+        </div>
+        <div style="font-size:17px;color:var(--muted);line-height:1.55;">
+          Our crafting users <strong style="color:var(--text);">are</strong> the user base. Instead of chasing mid-core retention with new mechanics, <strong style="color:var(--gold);">repair and deepen the experience</strong> for the players who already love what we have.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button class="btn" id="bp" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="pips" id="pips"></div>
+  <div id="counter">1 / 10</div>
+  <button class="btn" id="bn" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+const cvs = document.getElementById('particles');
+const ctx = cvs.getContext('2d');
+const colors = ['#f5c842','#a78bfa','#5b9cf6','#4ecca3','#f59e42','#f06680'];
+const LINE_DIST = 300;
+const NUM = 25;
+let W, H;
+
+function resize() {
+  W = cvs.width = window.innerWidth;
+  H = cvs.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const pts = [];
+for (let i = 0; i < NUM; i++) {
+  pts.push({
+    x: Math.random()*W, y: Math.random()*H,
+    vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+    size: 3+Math.random()*5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    phase: Math.random()*Math.PI*2,
+    noiseX: Math.random()*1000, noiseY: Math.random()*1000,
+    opacity: .4+Math.random()*.4
+  });
+}
+
+function tick(t) {
+  ctx.clearRect(0,0,W,H);
+  const ts = t*.001;
+
+  for (const p of pts) {
+    p.noiseX += .002; p.noiseY += .002;
+    const wobbleX = Math.sin(ts*.4+p.phase)*0.15 + Math.sin(ts*.7+p.phase*2.3)*0.1;
+    const wobbleY = Math.cos(ts*.35+p.phase*1.7)*0.15 + Math.cos(ts*.6+p.phase*3.1)*0.1;
+    p.x += p.vx + wobbleX;
+    p.y += p.vy + wobbleY;
+    if (p.x<-20) p.x=W+20; if (p.x>W+20) p.x=-20;
+    if (p.y<-20) p.y=H+20; if (p.y>H+20) p.y=-20;
+    p.curOpacity = p.opacity * (.6 + .4*Math.sin(ts*1.2+p.phase));
+  }
+
+  for (let i=0;i<pts.length;i++) {
+    for (let j=i+1;j<pts.length;j++) {
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if (d<LINE_DIST) {
+        const alpha = (1-d/LINE_DIST)*.35;
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.strokeStyle = 'rgba(255,255,255,'+alpha+')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (const p of pts) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size/2, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.curOpacity;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+const slides = document.querySelectorAll('.slide');
+const pips = document.getElementById('pips');
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+const bp = document.getElementById('bp');
+const bn = document.getElementById('bn');
+const N = slides.length;
+let cur = 0;
+
+for (let i = 0; i < N; i++) {
+  const p = document.createElement('div');
+  p.className = 'pip' + (i===0?' on':'');
+  p.onclick = () => goTo(i);
+  pips.appendChild(p);
+}
+
+function goTo(n) {
+  if (n < 0 || n >= N) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  const prev = cur;
+  setTimeout(() => slides[prev].classList.remove('exit'), 500);
+  cur = n;
+  slides[cur].classList.add('active');
+  pips.querySelectorAll('.pip').forEach((p,i) => p.classList.toggle('on', i===cur));
+  counter.textContent = (cur+1)+' / '+N;
+  bar.style.width = ((cur+1)/N*100)+'%';
+  bp.disabled = cur===0;
+  bn.disabled = cur===N-1;
+  slides[prev].querySelectorAll('video').forEach(v => v.pause());
+  slides[cur].querySelectorAll('video').forEach(v => { v.currentTime = 0; v.play(); });
+}
+
+function go(d) { goTo(cur+d); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') go(1);
+  if (e.key==='ArrowLeft') go(-1);
+});
+
+bar.style.width = (1/N*100)+'%';
+counter.textContent = '1 / '+N;
+</script>
+</body>
+</html>
