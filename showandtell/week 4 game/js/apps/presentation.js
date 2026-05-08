@@ -317,18 +317,25 @@
       prevBtn.addEventListener('click', () => openSlide(idx < 0 ? 0 : idx - 1));
       nextBtn.addEventListener('click', () => openSlide(idx < 0 ? 0 : idx + 1));
 
-      w.bodyEl.tabIndex = 0;
-      w.bodyEl.addEventListener('keydown', e => {
+      const onGlobalKey = e => {
+        /* Don't hijack arrows when typing in a text field */
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
         if (e.key === 'ArrowLeft') { e.preventDefault(); openSlide(idx < 0 ? 0 : idx - 1); }
-        else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); openSlide(idx < 0 ? 0 : idx + 1); }
-      });
+        else if (e.key === 'ArrowRight') { e.preventDefault(); openSlide(idx < 0 ? 0 : idx + 1); }
+      };
+      document.addEventListener('keydown', onGlobalKey);
 
       const onWinClose = (e) => {
         if (!e.detail) return;
         partWins = partWins.filter(pw => pw.wid !== e.detail.wid);
       };
       WM.on('close', onWinClose);
-      w.onClose = () => { WM.off('close', onWinClose); closeAll(); };
+      w.onClose = () => {
+        WM.off('close', onWinClose);
+        document.removeEventListener('keydown', onGlobalKey);
+        closeAll();
+      };
 
       updateCounter();
     }

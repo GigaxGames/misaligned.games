@@ -315,6 +315,21 @@
 
     awaitBootDismiss(() => {
       setTimeout(() => Toast('Welcome, ' + Settings.get('username') + '.'), 400);
+      setTimeout(() => {
+        const mine = WM.open('minesweeper');
+        if (mine) {
+          const desk = document.getElementById('desktop');
+          mine.el.style.left = Math.max(0, desk.clientWidth - mine.el.offsetWidth - 20) + 'px';
+          mine.el.style.top = '20px';
+        }
+        const pres = WM.open('presentation');
+        if (pres) {
+          const desk = document.getElementById('desktop');
+          pres.el.style.left = Math.max(0, Math.floor((desk.clientWidth - pres.el.offsetWidth) / 2)) + 'px';
+          pres.el.style.top = Math.max(0, desk.clientHeight - pres.el.offsetHeight - 20) + 'px';
+          pres.focus();
+        }
+      }, 600);
     });
   }
 
