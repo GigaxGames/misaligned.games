@@ -42,7 +42,7 @@
       PostHog collects anonymous product-analytics events (e.g. when a run starts and ends, and its
       outcome), an anonymous device identifier, and an approximate (country-level) location derived
       from your IP address. We do not collect your name, email, or precise location, and we do not
-      sell your data or use it for advertising.</p>
+      sell your data.</p>
 
       <h2>Session replay</h2>
       <p>On a small, sampled share of sessions on higher-end devices, we may record an anonymized
@@ -64,6 +64,16 @@
       <p>The app uses your device&rsquo;s internet access to send anonymous analytics events and to sync
       cloud saves. No other personal data leaves your device.</p>
 
+
+      <h2>Install attribution (advertising ID)</h2>
+      <p>The Android app includes the AppsFlyer SDK to measure which ad campaigns lead to installs.
+      For this purpose it collects your device&rsquo;s advertising ID (GAID) and basic install and
+      app-open events, and declares the <code>com.google.android.gms.permission.AD_ID</code> permission.
+      AppsFlyer processes this attribution data on our behalf, and aggregate campaign results are shared
+      with our advertising partners (e.g. AppLovin) to measure and optimize campaigns. We do not use it
+      to build an advertising profile of you, and we do not sell it. You can reset or delete your
+      advertising ID at any time in Android Settings &rarr; Privacy &rarr; Ads.</p>
+
       <h2>Children</h2>
       <p>The game is not directed at children under 13.</p>
 
@@ -72,7 +82,8 @@
       <a href="mailto:hello@misaligned.games">hello@misaligned.games</a> and we will action it.
       We delete your analytics events, device identifier, approximate location, and any session
       replay recordings within 30 days of collection or of your request, whichever is sooner; we
-      retain nothing beyond that window.</p>
+      retain nothing beyond that window. On request we also instruct AppsFlyer to delete the
+      attribution data associated with your device.</p>
     </div>
 
     <footer>
