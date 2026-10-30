@@ -4,74 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misaligned Games</title>
-    <meta name="description" content="Misaligned Games, an indie game studio. Currently developing Entropedia, a generative PvP deckbuilder.">
+    <meta name="description" content="Misaligned Games, an indie game studio making weird little mobile games. Play all 22 of them on Google Play.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&family=Merriweather:wght@300;400;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="blobs" aria-hidden="true">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>
+    </div>
+
     <header>
-        <img src="images/studio_logo.png" alt="Misaligned Games" class="header-logo">
+        <a href="#top" class="header-home"><img src="images/studio_logo.png" alt="Misaligned Games" class="header-logo"></a>
         <nav>
+            <a href="#games">Games</a>
             <a href="#about">About</a>
-            <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
+            <a href="mailto:contact@misaligned.games">Say hi</a>
         </nav>
     </header>
 
-    <main>
+    <main id="top">
         <section class="hero">
             <div class="diy-logo hero-logo" id="heroLogo"></div>
             <h1>Games that go a bit <span class="sideways">sideways</span></h1>
+            <p class="tagline">We make weird little games, fast. <strong>22</strong> of them are on Google Play right now. Go poke one.</p>
             <div class="cta-group">
-                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">Play the demo</a>
-            </div>
-            <a href="#game" class="scroll-hint">DISCOVER <span class="arrow">&#8595;</span></a>
-        </section>
-
-        <div class="divider"></div>
-
-        <section class="game-section" id="game">
-            <div class="game-header">
-                <img src="images/Entropedia_logo.png" alt="Entropedia" class="game-logo">
-                <p class="game-sub">Procedural PvP Deckbuilder</p>
-                <p class="game-desc">Every card is procedurally crafted. Throw ingredients into the cauldron, discover unique combinations, and battle with a deck no one else has.</p>
-            </div>
-
-            <div class="cauldron-craft">
-                <div class="craft-inputs">
-                    <img src="images/cards_widget/FullMoon.png" alt="Full Moon" class="craft-card craft-card-1">
-                    <img src="images/cards_widget/Wolf.png" alt="Wolf" class="craft-card craft-card-2">
-                </div>
-
-                <img src="images/cards_widget/arrow_craft.png" alt="" class="craft-arrow">
-
-                <div class="cauldron-scene">
-                    <img src="images/cauldron/cauldron_logs.png" class="c-layer c-logs" alt="">
-                    <img src="images/cauldron/fire/CauldronFire1.png" class="c-layer c-fire" alt="" id="cauldronFire">
-                    <img src="images/cauldron/CauldronBack.png" class="c-layer c-back" alt="">
-                    <canvas class="c-layer c-swirl" width="178" height="90"></canvas>
-                    <img src="images/cauldron/CauldronFront.png" class="c-layer c-front" alt="">
-                    <img src="images/cauldron/CauldronSmoke1.png" class="c-layer c-smoke" id="smoke1" alt="">
-                    <img src="images/cauldron/CauldronSmoke2.png" class="c-layer c-smoke" id="smoke2" alt="">
-                    <img src="images/cauldron/CauldronSmoke3.png" class="c-layer c-smoke" id="smoke3" alt="">
-                    <img src="images/cards_widget/Werewolf.png" alt="Werewolf" class="c-layer c-result">
-                </div>
-            </div>
-
-            <div class="screenshots">
-                <div class="screenshot"><img src="images/Screenshot1.webp" alt="Card crafting"></div>
-                <div class="screenshot"><img src="images/Screenshot2.webp" alt="PvP battle"></div>
-                <div class="screenshot"><img src="images/Screenshot4.webp" alt="Adventure"></div>
-            </div>
-
-            <div class="screenshots-cta">
-                <a href="https://demo.entropedia.xyz" target="_blank" class="btn btn-primary">Play the Demo</a>
+                <a href="#games" class="btn btn-primary">Show me the games</a>
+                <a href="https://play.google.com/store/apps/developer?id=Misaligned+Games" target="_blank" rel="noopener" class="btn btn-secondary">Google Play page</a>
             </div>
         </section>
 
-        <div class="divider"></div>
+        <div class="marquee" aria-hidden="true">
+            <div class="marquee-track">
+                <span>Cooking</span><span>Pirates</span><span>Slimes</span><span>Orcs</span><span>Tiny armies</span><span>Flesh blobs</span><span>Grass mowing</span><span>Spellbooks</span><span>Trains</span><span>Food critics</span>
+                <span>Cooking</span><span>Pirates</span><span>Slimes</span><span>Orcs</span><span>Tiny armies</span><span>Flesh blobs</span><span>Grass mowing</span><span>Spellbooks</span><span>Trains</span><span>Food critics</span>
+            </div>
+        </div>
+
+        <section class="games-section" id="games">
+            <h2>All 22 games <span class="wobble">(so far)</span></h2>
+            <p class="section-sub">Tap a card to grab it on Google Play. Can't pick? Let fate decide.</p>
+
+            <div class="chips" role="toolbar" aria-label="Filter games by genre">
+                <button class="chip is-active" data-filter="all">All</button>
+                <button class="chip" data-filter="action">Action</button>
+                <button class="chip" data-filter="adventure">Adventure</button>
+                <button class="chip" data-filter="arcade">Arcade</button>
+                <button class="chip" data-filter="casual">Casual</button>
+                <button class="chip" data-filter="puzzle">Puzzle</button>
+                <button class="chip" data-filter="role-playing">Role Playing</button>
+                <button class="chip" data-filter="simulation">Simulation</button>
+                <button class="chip" data-filter="social">Social</button>
+                <button class="chip" data-filter="strategy">Strategy</button>
+                <button class="chip chip-dice" id="shuffle" title="Shuffle the games">Shuffle!</button>
+            </div>
+
+            <div class="game-grid" id="gameGrid">
+                <a class="game-card" data-genre="casual" href="https://play.google.com/store/apps/details?id=games.misaligned.infinitekitchen" target="_blank" rel="noopener">
+                    <img src="images/games/infinitekitchen.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Casual</span>
+                    <h3>Infinite Kitchen</h3>
+                    <p>Cook invented dishes, plate them, and face a brutally honest food critic.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="action" href="https://play.google.com/store/apps/details?id=games.misaligned.onetruehero" target="_blank" rel="noopener">
+                    <img src="images/games/onetruehero.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Action</span>
+                    <h3>One True Hero</h3>
+                    <p>One thumb. One hero. Fight waves of enemies in this co-op survivor looter!</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="action" href="https://play.google.com/store/apps/details?id=games.misaligned.islandkings" target="_blank" rel="noopener">
+                    <img src="images/games/islandkings.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Action</span>
+                    <h3>Island Kings</h3>
+                    <p>Pirate battle royale! Sink rival ships, raid islands and fight the Kraken.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="simulation" href="https://play.google.com/store/apps/details?id=games.misaligned.cookinghero" target="_blank" rel="noopener">
+                    <img src="images/games/cookinghero.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Simulation</span>
+                    <h3>Cooking Hero: Dream Dish</h3>
+                    <p>Cook new dishes, win over guests and grow a food cart into a restaurant.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="puzzle" href="https://play.google.com/store/apps/details?id=games.misaligned.matchmerge" target="_blank" rel="noopener">
+                    <img src="images/games/matchmerge.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Puzzle</span>
+                    <h3>Match Merge</h3>
+                    <p>Match and merge colorful blocks in this relaxing puzzle game.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="simulation" href="https://play.google.com/store/apps/details?id=games.misaligned.drilldown" target="_blank" rel="noopener">
+                    <img src="images/games/drilldown.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Simulation</span>
+                    <h3>Drill Down: Idle Mining</h3>
+                    <p>Sink the shaft, chase the seams, haul the ore out before the bit cooks.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="simulation" href="https://play.google.com/store/apps/details?id=games.misaligned.agentcrossing" target="_blank" rel="noopener">
+                    <img src="images/games/agentcrossing.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Simulation</span>
+                    <h3>Hearsay</h3>
+                    <p>An AI town simulation where your neighbors have minds of their own.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.savetheprincess" target="_blank" rel="noopener">
+                    <img src="images/games/savetheprincess.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Save The Princess</h3>
+                    <p>Co-op tower defense! Play cards, build towers and hold the castle for 3 minutes.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="action" href="https://play.google.com/store/apps/details?id=games.misaligned.blockhero" target="_blank" rel="noopener">
+                    <img src="images/games/blockhero.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Action</span>
+                    <h3>Block Hero</h3>
+                    <p>Walk the path, auto-battle monsters and grab crazy voxel loot!</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="role-playing" href="https://play.google.com/store/apps/details?id=games.misaligned.unbounddescent" target="_blank" rel="noopener">
+                    <img src="images/games/unbounddescent.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Role Playing</span>
+                    <h3>Unbound Descent</h3>
+                    <p>Tear pages from your spellbook and fuse them. A first-person dungeon stepper.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="simulation" href="https://play.google.com/store/apps/details?id=games.misaligned.cosykitchen" target="_blank" rel="noopener">
+                    <img src="images/games/cosykitchen.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Simulation</span>
+                    <h3>Cosy Kitchen</h3>
+                    <p>Gather, cook, and open your own cosy café.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="arcade" href="https://play.google.com/store/apps/details?id=games.misaligned.rollingmeadows" target="_blank" rel="noopener">
+                    <img src="images/games/rollingmeadows.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Arcade</span>
+                    <h3>Rolling Meadows</h3>
+                    <p>One touch: dive down the slopes, fly off the ramps and mow every blade of grass.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="adventure" href="https://play.google.com/store/apps/details?id=games.misaligned.infinite_survivor" target="_blank" rel="noopener">
+                    <img src="images/games/infinite_survivor.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Adventure</span>
+                    <h3>Infinite Survivor</h3>
+                    <p>A little castaway, an island, and your tray of emoji. Drag one and he does it.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="arcade" href="https://play.google.com/store/apps/details?id=games.misaligned.wagonguard" target="_blank" rel="noopener">
+                    <img src="images/games/wagonguard.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Arcade</span>
+                    <h3>Train Defense</h3>
+                    <p>Auto-shoot roguelite: guard your food train from skeletons and goblins.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.orchorde" target="_blank" rel="noopener">
+                    <img src="images/games/orchorde.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Orc Horde</h3>
+                    <p>You are the horde. Shape it with your hands and break the gun line open.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.tinypixelrts" target="_blank" rel="noopener">
+                    <img src="images/games/tinypixelrts.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Tiny Pixel RTS</h3>
+                    <p>Build your base and lead tiny armies in five-minute tactical battles.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.battlemage" target="_blank" rel="noopener">
+                    <img src="images/games/battlemage.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Battle Mage</h3>
+                    <p>Plan your moves. Cast your spells. Outsmart rival mages.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.lilwarriors" target="_blank" rel="noopener">
+                    <img src="images/games/lilwarriors.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Lil Warriors</h3>
+                    <p>Build your warband, choose your tactics, and lead tiny armies into battle.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="social" href="https://play.google.com/store/apps/details?id=games.misaligned.gotouchgrass" target="_blank" rel="noopener">
+                    <img src="images/games/gotouchgrass.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Social</span>
+                    <h3>Go Touch Grass</h3>
+                    <p>Daily live photo dares. Go outside, shoot it live, post the proof.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="strategy" href="https://play.google.com/store/apps/details?id=games.misaligned.rivalrealms" target="_blank" rel="noopener">
+                    <img src="images/games/rivalrealms.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Strategy</span>
+                    <h3>Rival Realms</h3>
+                    <p>Command medieval armies in real-time war. Build, raid, and conquer live.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="simulation" href="https://play.google.com/store/apps/details?id=games.misaligned.idleorganism" target="_blank" rel="noopener">
+                    <img src="images/games/idleorganism.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Simulation</span>
+                    <h3>Idle Organism: Eat the World</h3>
+                    <p>Grow a blob of flesh from a microscope slide until it eats the whole planet.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+                <a class="game-card" data-genre="role-playing" href="https://play.google.com/store/apps/details?id=games.misaligned.slimeworld" target="_blank" rel="noopener">
+                    <img src="images/games/slimeworld.png" alt="" class="game-icon" loading="lazy" width="256" height="256">
+                    <span class="genre-tag">Role Playing</span>
+                    <h3>Slime World</h3>
+                    <p>One-thumb RPG: slay slimes, level up, survive the swarm.</p>
+                    <span class="get-it">Get it on Google Play &rarr;</span>
+                </a>
+            </div>
+        </section>
 
         <section class="about-section" id="about">
             <h2>What drives us</h2>
@@ -98,28 +244,63 @@
     <footer>
         <img src="images/studio_logo.png" alt="Misaligned Games" class="footer-logo">
         <div class="footer-links">
-            <a href="https://demo.entropedia.xyz" target="_blank">Play Demo</a>
+            <a href="https://play.google.com/store/apps/developer?id=Misaligned+Games" target="_blank" rel="noopener">Google Play</a>
             <a href="mailto:contact@misaligned.games">Contact</a>
+            <a href="privacy/">Privacy</a>
+            <a href="terms/">Terms</a>
         </div>
-        <p class="footer-copy">&copy; 2025 Misaligned Games</p>
+        <p class="footer-copy">&copy; 2026 Misaligned Games</p>
     </footer>
 
-    <script src="js/cauldron.js"></script>
     <script src="js/logo.js"></script>
     <script>
     (function() {
         const el = document.querySelector('.sideways');
-        if (!el) return;
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    el.style.animation = 'none';
-                    el.offsetHeight;
-                    el.style.animation = '';
-                }
+        if (el) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        el.style.animation = 'none';
+                        el.offsetHeight;
+                        el.style.animation = '';
+                    }
+                });
+            }, { threshold: 0.5 });
+            observer.observe(el);
+        }
+
+        // Every card gets its own goofy tilt
+        const grid = document.getElementById('gameGrid');
+        const cards = [...grid.children];
+        const colors = ['var(--pink)', 'var(--yellow)', 'var(--teal)', 'var(--blue)', 'var(--orange)', 'var(--purple)', 'var(--green)'];
+        cards.forEach((card, i) => {
+            card.style.setProperty('--tilt', (Math.random() * 4 - 2).toFixed(2) + 'deg');
+            card.style.setProperty('--card', colors[i % colors.length]);
+        });
+
+        // Genre filter chips
+        const chips = document.querySelectorAll('.chip[data-filter]');
+        chips.forEach(chip => chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.toggle('is-active', c === chip));
+            const f = chip.dataset.filter;
+            cards.forEach(card => card.hidden = f !== 'all' && card.dataset.genre !== f);
+        }));
+
+        // Shuffle: reorder the cards and give them a fresh wobble
+        document.getElementById('shuffle').addEventListener('click', () => {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            cards.forEach((card, i) => {
+                card.style.setProperty('--tilt', (Math.random() * 4 - 2).toFixed(2) + 'deg');
+                card.classList.remove('boing');
+                card.offsetHeight;
+                card.style.animationDelay = (i * 25) + 'ms';
+                card.classList.add('boing');
+                grid.appendChild(card);
             });
-        }, { threshold: 0.5 });
-        observer.observe(el);
+        });
     })();
     </script>
 </body>
